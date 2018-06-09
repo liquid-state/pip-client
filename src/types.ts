@@ -42,3 +42,11 @@ export interface PrivateInformationProvider {
   sendAcceptance(acceptable: Acceptable, jwt: JWT): Promise<void>;
   userHasAccepted(acceptable: Acceptable, jwt: JWT): Promise<boolean>;
 }
+
+export interface IPIPService {
+  authenticateViaCode(code: string): Promise<JWT>;
+  consumeCode(code: string, userId: string): Promise<void>;
+  getUserData<T>(dataType: string): Promise<PIPObject<T>>;
+  putUserData<T>(dataType: string, data: T): Promise<PIPObject<T>>;
+  raw(url: string, init: RequestInit): Promise<Response>;
+}
