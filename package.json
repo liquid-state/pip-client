@@ -1,0 +1,51 @@
+{
+  "name": "@liquid-state/pip-client",
+  "version": "1.1.0",
+  "description": "Client library for Liquid State Private Information Providers (PIP)",
+  "files": [
+    "dist/"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --parser typescript --single-quote --trailing-comma es5 --print-width 99 --write \"./src/**/*.ts\"",
+    "test": "jest",
+    "prepack": "jest && tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liquid-state/pip-client.git"
+  },
+  "author": "Liquid State <dev@liquid-state.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/liquid-state/pip-client/issues"
+  },
+  "homepage": "https://github.com/liquid-state/pip-client#readme",
+  "dependencies": {
+    "lodash-es": "^4.17.5"
+  },
+  "devDependencies": {
+    "@types/jest": "^22.1.2",
+    "@types/lodash": "^4.14.103",
+    "jest": "^22.3.0",
+    "prettier": "^1.10.2",
+    "ts-jest": "^22.0.4",
+    "typescript": "^2.7.1"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|.*.test)\\.(ts|tsx|js)$",
+    "roots": [
+      "<rootDir>/src"
+    ]
+  }
+}
