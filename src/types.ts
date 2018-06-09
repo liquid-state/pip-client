@@ -50,3 +50,24 @@ export interface IPIPService {
   putUserData<T>(dataType: string, data: T): Promise<PIPObject<T>>;
   raw(url: string, init: RequestInit): Promise<Response>;
 }
+
+export interface IPIPAcceptable {
+  acceptable(): Promise<Acceptable>;
+  isAccepted(): Promise<boolean>;
+  content(languages: string[]): Promise<AcceptableContent>;
+  accept(): Promise<void>;
+}
+
+export type FormResponse = {
+  title?: string;
+  schema: object;
+  uiSchema: object;
+  data: object;
+  extraData: object;
+  translations?: object;
+};
+
+export interface IPIPForm {
+  form(): Promise<FormResponse>;
+  submit(formData: object, extraData?: object): Promise<object>;
+}
