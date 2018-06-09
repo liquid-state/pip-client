@@ -49,6 +49,8 @@ export interface IPIPService {
   getUserData<T>(dataType: string): Promise<PIPObject<T>>;
   putUserData<T>(dataType: string, data: T): Promise<PIPObject<T>>;
   raw(url: string, init: RequestInit): Promise<Response>;
+  form(id: string): Promise<IPIPForm>,
+  acceptable(id: string): Promise<IPIPAcceptable>
 }
 
 export interface IPIPAcceptable {

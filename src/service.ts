@@ -1,4 +1,6 @@
-import { PrivateInformationProvider, IPIPService, JWT, PIPObject } from './types';
+import { PrivateInformationProvider, IPIPService, JWT, PIPObject, IPIPForm, IPIPAcceptable } from './types';
+import PIPForm from './form';
+import PIPAcceptable from './acceptable';
 
 export type IdentityOptions = {
   jwt?: string;
@@ -12,6 +14,14 @@ export default class PIPService implements IPIPService {
   private _jwt: string | undefined = undefined;
 
   constructor(private pip: PrivateInformationProvider, private identity: IdentityOptions) {}
+
+  form = async (id: string): Promise<IPIPForm> => {
+    return new PIPForm(id, this.pip, await this.jwt());
+  }
+
+  acceptable = async (id: string): Promise<IPIPAcceptable> => {
+    return new PIPAcceptable(id, this.pip, await this.jwt());
+  }
 
   authenticateViaCode = async (code: string): Promise<JWT> => {
     const jwt = await this.pip.validateCode(code);
