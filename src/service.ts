@@ -51,7 +51,7 @@ export default class PIPService implements IPIPService {
   Expects the user to provide a fully qualified url, request parameters etc.
   The only thing this method does is inject the Authorization header if it is missing.
   */
-  raw = async (url: string, init: RequestInit): Promise<Response> => {
+  raw = async (url: string, init: RequestInit = {}): Promise<Response> => {
     let jwt;
     try {
       jwt = await this.jwt();
