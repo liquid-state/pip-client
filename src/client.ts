@@ -26,7 +26,7 @@ export default class PIPClient implements PrivateInformationProvider {
       this.options.apiRoot = this.options.apiRoot.slice(0, this.options.apiRoot.length - 1);
     }
 
-    this.fetch = this.options.fetch ? this.options.fetch : fetch;
+    this.fetch = this.options.fetch ? this.options.fetch : fetch.bind(window);
   }
 
   validateCode = async (code: string): Promise<JWT> => {
