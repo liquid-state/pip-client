@@ -62,12 +62,12 @@ export default class PIPService implements IPIPService {
       if (init.headers && init.headers.constructor === Headers) {
         init.headers = init.headers as Headers;
         if (!init.headers.has('Authorization')) {
-          init.headers.set('Authorization', jwt);
+          init.headers.set('Authorization', `Bearer ${jwt}`);
         }
       } else if (init.headers && !('Authorization' in init.headers)) {
-        (init.headers as any)['Authorization'] = jwt;
+        (init.headers as any)['Authorization'] = `Bearer ${jwt}`;
       } else if (!init.headers) {
-        init.headers = { Authorization: jwt };
+        init.headers = { Authorization: `Bearer ${jwt}` };
       }
     }
 
