@@ -42,7 +42,7 @@ describe('PIP Client', () => {
     expect(f).toHaveBeenCalledWith('test/api/v1/codes/register/', {
       method: 'POST',
       headers: {
-        Authorization: 'jwt',
+        Authorization: 'Bearer jwt',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

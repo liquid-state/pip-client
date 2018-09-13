@@ -1,13 +1,11 @@
 import { PrivateInformationProvider, IPIPService, JWT, PIPObject, IPIPForm, IPIPAcceptable } from './types';
+import { IIdentityProvider } from '@liquid-state/iwa-identity/dist/manager';
 import PIPForm from './form';
 import PIPAcceptable from './acceptable';
 
 export type IdentityOptions = {
   jwt?: string;
-  identityProvider?: {
-    getIdentity(): Promise<{ identity: string; credentials: any }>;
-    update(identity: string, credentials: any): Promise<void>;
-  };
+  identityProvider?: IIdentityProvider<any>
 };
 
 export default class PIPService implements IPIPService {

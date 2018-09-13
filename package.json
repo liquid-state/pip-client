@@ -27,12 +27,19 @@
     "lodash-es": "^4.17.5"
   },
   "devDependencies": {
+    "@liquid-state/iwa-core": "^1.6.1",
+    "@liquid-state/iwa-identity": "^1.0.3",
+    "@liquid-state/iwa-keyvalue": "^1.0.3",
     "@types/jest": "^22.1.2",
     "@types/lodash": "^4.14.103",
     "jest": "^22.3.0",
     "prettier": "^1.10.2",
     "ts-jest": "^22.0.4",
     "typescript": "^2.7.1"
+  },
+  "peerDependencies": {
+    "@liquid-state/iwa-core": "^1.6.1",
+    "@liquid-state/iwa-identity": "^1.0.3"
   },
   "jest": {
     "moduleFileExtensions": [

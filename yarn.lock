@@ -16,6 +16,20 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
+"@liquid-state/iwa-core@^1.6.1":
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/@liquid-state/iwa-core/-/iwa-core-1.6.1.tgz#8ee4e189de538fccb185b6c3e9dc8bbd7844c1e8"
+  dependencies:
+    lodash-es "^4.17.5"
+
+"@liquid-state/iwa-identity@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@liquid-state/iwa-identity/-/iwa-identity-1.0.3.tgz#d9ab02092bb56d4085b6d6b541f353a7d73a1754"
+
+"@liquid-state/iwa-keyvalue@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@liquid-state/iwa-keyvalue/-/iwa-keyvalue-1.0.3.tgz#97675f6a26bfd52f888d859666528baad0affe5a"
+
 "@types/jest@^22.1.2":
   version "22.2.3"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-22.2.3.tgz#0157c0316dc3722c43a7b71de3fdf3acbccef10d"
