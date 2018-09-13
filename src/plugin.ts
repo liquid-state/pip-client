@@ -51,7 +51,7 @@ export default class PIPPlugin {
       serviceOptions.identityProvider = app.use(IdentityPlugin).forService('pip');
     }
 
-    const client = new PIPClient(this.options);
+    const client = new PIPClient(clientOptions);
     const service = new PIPService(client, serviceOptions);
     return {
       client,
