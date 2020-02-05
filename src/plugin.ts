@@ -6,16 +6,16 @@ import { PrivateInformationProvider, IPIPService } from './types';
 
 export type DefaultConfig = {};
 export type Config = {
-  apiRoot?: string
-  apiRootConfigName?: string,
-  useAls?: boolean,
-  jwt?: string,
-  useIdentity: true,
+  apiRoot?: string;
+  apiRootConfigName?: string;
+  useAls?: boolean;
+  jwt?: string;
+  useIdentity: true;
 };
 
 export type Plugin = {
-  client: PrivateInformationProvider,
-  service: IPIPService
+  client: PrivateInformationProvider;
+  service: IPIPService;
 };
 
 export default class PIPPlugin {
@@ -28,7 +28,7 @@ export default class PIPPlugin {
 
   public key = PIPPlugin.key;
 
-  private constructor(private options: Config) { };
+  private constructor(private options: Config) {}
 
   private apiRoot: string;
 
@@ -39,8 +39,9 @@ export default class PIPPlugin {
     } else if (this.options.apiRootConfigName) {
       // Load and cache the api root from config.
       if (!this.apiRoot) {
-        const { [this.options.apiRootConfigName]: apiRoot } =
-          await app.configuration(this.options.apiRootConfigName);
+        const { [this.options.apiRootConfigName]: apiRoot } = await app.configuration(
+          this.options.apiRootConfigName
+        );
         this.apiRoot = apiRoot;
       }
       this.options.apiRoot = this.apiRoot;
@@ -55,7 +56,7 @@ export default class PIPPlugin {
     const service = new PIPService(client, serviceOptions);
     return {
       client,
-      service
+      service,
     };
   }
 }

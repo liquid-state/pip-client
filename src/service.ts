@@ -1,11 +1,18 @@
-import { PrivateInformationProvider, IPIPService, JWT, PIPObject, IPIPForm, IPIPAcceptable } from './types';
+import {
+  PrivateInformationProvider,
+  IPIPService,
+  JWT,
+  PIPObject,
+  IPIPForm,
+  IPIPAcceptable,
+} from './types';
 import { IIdentityProvider } from '@liquid-state/iwa-identity/dist/manager';
 import PIPForm from './form';
 import PIPAcceptable from './acceptable';
 
 export type IdentityOptions = {
   jwt?: string;
-  identityProvider?: IIdentityProvider<any>
+  identityProvider?: IIdentityProvider<any>;
 };
 
 export default class PIPService implements IPIPService {
@@ -15,11 +22,11 @@ export default class PIPService implements IPIPService {
 
   form = async (id: string): Promise<IPIPForm> => {
     return new PIPForm(id, this.pip, await this.jwt());
-  }
+  };
 
   acceptable = async (id: string): Promise<IPIPAcceptable> => {
     return new PIPAcceptable(id, this.pip, await this.jwt());
-  }
+  };
 
   authenticateViaCode = async (code: string): Promise<JWT> => {
     const jwt = await this.pip.validateCode(code);
