@@ -54,18 +54,18 @@ export default class PIPAdminClient {
     return objectType;
   };
 
-  getObjectsForType = async <T>(type: ObjectType): Promise<PIPObject<T>[]> => {
-    const url = this.buildObjectsUrl(type.objects);
+  getObjectsForType = async <T>(type: ObjectType | string): Promise<PIPObject<T>[]> => {
+    const url = this.buildObjectsUrl(type);
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
   };
 
   getLatestObjectsForUsers = async <T>(
-    type: ObjectType,
+    type: ObjectType | string,
     users: string[]
   ): Promise<PIPObject<T>[]> => {
-    const url = this.buildObjectsUrl(type.objects, 'latest', users);
+    const url = this.buildObjectsUrl(type, 'latest', users);
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
@@ -99,7 +99,13 @@ export default class PIPAdminClient {
     }
   }
 
-  private buildObjectsUrl(baseUrl: string, version?: string, users?: string[]) {
+  private buildObjectsUrl(objectType: ObjectType | string, version?: string, users?: string[]) {
+    let baseUrl = "";
+    if (typeof objectType !== "string") {
+      baseUrl = objectType.objects;
+    } else {
+      baseUrl = `${this.getUrl('objectTypes')}${objectType}/objects/`;
+    }
     if (version === 'latest') {
       let url = `${baseUrl}${version}/`;
       if (users) {
