@@ -61,7 +61,10 @@ export default class PIPClient implements PrivateInformationProvider {
     this.verifyResponse(resp);
     const objectType = (await resp.json()) as ObjectType;
     // Return children and parents as object type keys instead of urls.
-    const getKey = (url: string) => url.substr(url.lastIndexOf('/') + 1);
+    const getKey = (url: string) => {
+      const split = url.split('/');
+      return split[split.length - 2];
+    }
     objectType.children = objectType.children.map(getKey);
     objectType.parents = objectType.parents.map(getKey);
     return objectType;
