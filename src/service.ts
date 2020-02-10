@@ -39,6 +39,11 @@ export default class PIPService implements IPIPService {
     return this.pip.consumeCode(code, userId, jwt);
   };
 
+  register = async(): Promise<void> => {
+    const jwt = await this.jwt();
+    return this.pip.register(jwt);
+  }
+
   getUserData = async <T>(dataType: string): Promise<PIPObject<T>> => {
     const jwt = await this.jwt();
     const objectType = await this.pip.getObjectType(dataType, jwt);

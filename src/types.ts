@@ -34,6 +34,7 @@ export interface AcceptableContent {
 export interface PrivateInformationProvider {
   validateCode(code: string): Promise<JWT>;
   consumeCode(code: string, appUserId: string, jwt: JWT): Promise<void>;
+  register(jwt: JWT): Promise<void>;
   getObjectType(key: string, jwt: JWT): Promise<ObjectType>;
   getObjectsForType<T>(type: ObjectType, jwt: JWT, version?: string): Promise<PIPObject<T>[]>;
   getLatestObjectForType<T>(type: ObjectType, jwt: JWT): Promise<PIPObject<T>>;
@@ -46,6 +47,7 @@ export interface PrivateInformationProvider {
 export interface IPIPService {
   authenticateViaCode(code: string): Promise<JWT>;
   consumeCode(code: string, userId: string): Promise<void>;
+  register(): Promise<void>;
   getUserData<T>(dataType: string): Promise<PIPObject<T>>;
   putUserData<T>(dataType: string, data: T): Promise<PIPObject<T>>;
   raw(url: string, init: RequestInit): Promise<Response>;
