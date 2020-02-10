@@ -67,7 +67,7 @@ export default class PIPForm implements IPIPForm {
       return {};
     }
     let translations = await this.pip.getLatestObjectForType(type, this.jwt);
-    return translations.json || {};
+    return (translations.json || {}) as object;
   }
 
   private async getFormData(childTypes: ObjectType[]): Promise<FormData> {
@@ -79,7 +79,7 @@ export default class PIPForm implements IPIPForm {
       };
     }
     const formData = await this.pip.getLatestObjectForType(type, this.jwt);
-    const result = formData.json || {};
+    const result = (formData.json || {}) as object;
     return {
       // Support the old format for form data where the data is stored directly as formData
       // As well as the new format where it is nested in the formData.data property
