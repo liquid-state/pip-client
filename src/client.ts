@@ -8,6 +8,7 @@ export type PIPOptions = {
 
 // Basic map of pip urls when using an apiRoot
 const domainMap: { [key: string]: string } = {
+  registerWithoutCode: '/api/v1/users/',
   validateCode: '/api/v1/codes/exchange/',
   registerCode: '/api/v1/codes/register/',
   objectTypes: '/api/v1/object_types/',
@@ -54,6 +55,20 @@ export default class PIPClient implements PrivateInformationProvider {
     });
     this.verifyResponse(resp);
   };
+
+  register = async (jwt: JWT): Promise<void> => {
+    const url = this.getUrl('registerWithoutCode');
+    const resp = await this.fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        jwt,
+      }),
+    });
+    this.verifyResponse(resp);
+  }
 
   getObjectType = async (key: string, jwt: JWT): Promise<ObjectType> => {
     const url = `${this.getUrl('objectTypes')}${key}/`;
