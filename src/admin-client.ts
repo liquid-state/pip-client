@@ -86,8 +86,9 @@ export default class PIPAdminClient {
     return resp.json();
   };
 
-  createObjectType = async <T>(
+  createObjectType = async (
     name: string,
+    app: string,
     parents?: string[],
     children?: string[]
   ): Promise<ObjectType> => {
@@ -98,6 +99,7 @@ export default class PIPAdminClient {
       headers: this.headers(),
       body: JSON.stringify({
         name,
+        app,
         children: children || [],
         parents: parents || [],
       }),
