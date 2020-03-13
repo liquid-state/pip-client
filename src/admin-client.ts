@@ -1,4 +1,4 @@
-import { ObjectType, PIPObject, ObjectType } from './types';
+import { ObjectType, PIPObject } from './types';
 
 interface IOptions {
   apiRoot?: string;
