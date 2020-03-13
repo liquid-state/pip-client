@@ -61,14 +61,14 @@ export default class PIPClient implements PrivateInformationProvider {
     const resp = await this.fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         jwt,
       }),
     });
     this.verifyResponse(resp);
-  }
+  };
 
   getObjectType = async (key: string, jwt: JWT): Promise<ObjectType> => {
     const url = `${this.getUrl('objectTypes')}${key}/`;
@@ -79,7 +79,7 @@ export default class PIPClient implements PrivateInformationProvider {
     const getKey = (url: string) => {
       const split = url.split('/');
       return split[split.length - 2];
-    }
+    };
     objectType.children = objectType.children.map(getKey);
     objectType.parents = objectType.parents.map(getKey);
     return objectType;
