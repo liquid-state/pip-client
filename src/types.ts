@@ -18,17 +18,6 @@ export interface PIPObject<T = object> {
   json: T;
 }
 
-export interface PIPObjectType<T = object> {
-  url: string;
-  uuid: string;
-  slug: string;
-  name: string;
-  children: string[];
-  parents: string[];
-  objects: string;
-  actions: string;
-}
-
 export interface Acceptable {
   url: string;
   uuid: string;

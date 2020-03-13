@@ -1,4 +1,4 @@
-import { ObjectType, PIPObject, PIPObjectType } from './types';
+import { ObjectType, PIPObject, ObjectType } from './types';
 
 interface IOptions {
   apiRoot?: string;
@@ -88,9 +88,9 @@ export default class PIPAdminClient {
 
   createObjectType = async <T>(
     name: string,
-    children: string[],
-    parents: string[]
-  ): Promise<PIPObjectType<T>> => {
+    parents?: string[],
+    children?: string[]
+  ): Promise<ObjectType> => {
     const url = this.getUrl('objectTypes');
 
     const resp = await fetch(url, {
