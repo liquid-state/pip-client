@@ -71,6 +71,43 @@ export default class PIPAdminClient {
     return resp.json();
   };
 
+  createObject = async <T>(type: ObjectType | string, json: object): Promise<PIPObject<T>> => {
+    const url = this.buildObjectsUrl(type);
+
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: this.headers(),
+      body: JSON.stringify({
+        app_user: null,
+        json,
+      }),
+    });
+    this.verifyResponse(resp);
+    return resp.json();
+  };
+
+  createObjectType = async (
+    name: string,
+    app: string,
+    parents?: string[],
+    children?: string[]
+  ): Promise<ObjectType> => {
+    const url = this.getUrl('objectTypes');
+
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: this.headers(),
+      body: JSON.stringify({
+        name,
+        app,
+        children: children || [],
+        parents: parents || [],
+      }),
+    });
+    this.verifyResponse(resp);
+    return resp.json();
+  };
+
   private getUrl(name: string) {
     let result;
     if (name in domainMap) {
@@ -100,8 +137,8 @@ export default class PIPAdminClient {
   }
 
   private buildObjectsUrl(objectType: ObjectType | string, version?: string, users?: string[]) {
-    let baseUrl = "";
-    if (typeof objectType !== "string") {
+    let baseUrl = '';
+    if (typeof objectType !== 'string') {
       baseUrl = objectType.objects;
     } else {
       baseUrl = `${this.getUrl('objectTypes')}${objectType}/objects/`;
