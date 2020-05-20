@@ -20,12 +20,20 @@ const domainMap: { [key: string]: string } = {
   objectTypes: '/api/v1/object_types/',
   acceptables: '/api/v1/acceptables/',
   acceptances: '/api/v1/acceptances/',
+  users: '/api/admin/v1/users/',
 };
 
 export default class PIPAdminClient {
   private options: IOptions;
   constructor(private identity: IdentityOptions, options?: IOptions) {
     this.options = options ? options : defaultOptions;
+  }
+
+  getAppUser = async (appUserUISId: string): Promise<object> => {
+    const url = `${this.getUrl('users')}${appUserUISId}`;
+    const resp = await fetch(url, { headers: this.headers() });
+    this.verifyResponse(resp);
+    return resp.json();
   }
 
   listObjectTypes = async (): Promise<ObjectType[]> => {
