@@ -62,8 +62,8 @@ export default class PIPAdminClient {
     return objectType;
   };
 
-  getObjectsForType = async <T>(type: ObjectType | string, version?: string): Promise<PIPObject<T>[]> => {
-    const url = this.buildObjectsUrl(type, version);
+  getObjectsForType = async <T>(type: ObjectType | string, version?: string, users?: string[]): Promise<PIPObject<T>[]> => {
+    const url = this.buildObjectsUrl(type, version, users);
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
