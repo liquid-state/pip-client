@@ -86,14 +86,14 @@ export default class PIPAdminClient {
     return resp.json();
   };
 
-  createObject = async <T>(type: ObjectType | string, json: object): Promise<PIPObject<T>> => {
+  createObject = async <T>(type: ObjectType | string, json: object, app_user?: string): Promise<PIPObject<T>> => {
     const url = this.buildObjectsUrl(type);
 
     const resp = await fetch(url, {
       method: 'POST',
       headers: this.headers(),
       body: JSON.stringify({
-        app_user: null,
+        app_user: app_user || null,
         json,
       }),
     });
