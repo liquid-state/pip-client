@@ -20,12 +20,20 @@ const domainMap: { [key: string]: string } = {
   objectTypes: '/api/v1/object_types/',
   acceptables: '/api/v1/acceptables/',
   acceptances: '/api/v1/acceptances/',
+  users: '/api/admin/v1/users/',
 };
 
 export default class PIPAdminClient {
   private options: IOptions;
   constructor(private identity: IdentityOptions, options?: IOptions) {
     this.options = options ? options : defaultOptions;
+  }
+
+  getAppUser = async (appUserUISId: string): Promise<object> => {
+    const url = `${this.getUrl('users')}${appUserUISId}`;
+    const resp = await fetch(url, { headers: this.headers() });
+    this.verifyResponse(resp);
+    return resp.json();
   }
 
   listObjectTypes = async (): Promise<ObjectType[]> => {
@@ -54,8 +62,15 @@ export default class PIPAdminClient {
     return objectType;
   };
 
-  getObjectsForType = async <T>(type: ObjectType | string, version?: string): Promise<PIPObject<T>[]> => {
-    const url = this.buildObjectsUrl(type, version);
+  getObjectsForType = async <T>(type: ObjectType | string, version?: string, users?: string[]): Promise<PIPObject<T>[]> => {
+    const url = this.buildObjectsUrl(type, version, users);
+    const resp = await fetch(url, { headers: this.headers() });
+    this.verifyResponse(resp);
+    return resp.json();
+  };
+
+  describeVersionsForType = async <T>(type: string, version?: string): Promise<PIPObject<T>[]> => {
+    const url = `${this.getUrl('objectTypes')}${type}/describe_versions/`;
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
@@ -71,14 +86,14 @@ export default class PIPAdminClient {
     return resp.json();
   };
 
-  createObject = async <T>(type: ObjectType | string, json: object): Promise<PIPObject<T>> => {
+  createObject = async <T>(type: ObjectType | string, json: object, app_user?: string): Promise<PIPObject<T>> => {
     const url = this.buildObjectsUrl(type);
 
     const resp = await fetch(url, {
       method: 'POST',
       headers: this.headers(),
       body: JSON.stringify({
-        app_user: null,
+        app_user: app_user || null,
         json,
       }),
     });
