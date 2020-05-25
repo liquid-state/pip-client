@@ -94,9 +94,9 @@ export default class PIPAdminClient {
   getObjectsForType = async <T>(
     type: ObjectType | string,
     version?: string,
-    users?: string[]
+    appUser?: string
   ): Promise<PIPObject<T>[]> => {
-    const url = this.buildObjectsUrl(type, version, users);
+    const url = this.buildObjectsUrl(type, version, appUser);
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
@@ -114,9 +114,16 @@ export default class PIPAdminClient {
 
   getLatestObjectsForUsers = async <T>(
     type: ObjectType | string,
-    users: string[]
+    appUsers: string[]
   ): Promise<PIPObject<T>[]> => {
-    const url = this.buildObjectsUrl(type, "latest", users);
+    let url = this.buildObjectsUrl(type, "latest");
+    if (appUsers) {
+      if (appUsers.length === 1) {
+        url = this.buildObjectsUrl(type, "latest", appUsers[0]);
+      } else {
+        url = `${url}?app_users=${JSON.stringify(appUsers)}}`;
+      }
+    }
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
@@ -194,7 +201,7 @@ export default class PIPAdminClient {
   private buildObjectsUrl(
     objectType: ObjectType | string,
     version?: string,
-    users?: string[]
+    app_user?: string
   ) {
     let baseUrl = "";
     if (typeof objectType !== "string") {
@@ -204,8 +211,8 @@ export default class PIPAdminClient {
     }
     if (version === "latest") {
       let url = `${baseUrl}${version}/`;
-      if (users) {
-        url = `${url}?app_users=${JSON.stringify(users)}`;
+      if (app_user) {
+        url = `${url}?app_user=${app_user}}`;
       }
       return url;
     }
