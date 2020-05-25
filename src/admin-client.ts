@@ -38,7 +38,7 @@ export default class PIPAdminClient {
   };
 
   getAppUser = async (appUserUISId: string): Promise<object> => {
-    const url = `${this.getUrl("users")}${appUserUISId}/`;
+    const url = `${this.getUrl("users")}?app_user_id=${appUserUISId}`;
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
