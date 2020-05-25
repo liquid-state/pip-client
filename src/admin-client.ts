@@ -212,7 +212,7 @@ export default class PIPAdminClient {
     if (version === "latest") {
       let url = `${baseUrl}${version}/`;
       if (app_user) {
-        url = `${url}?app_user=${app_user}}`;
+        url = `${url}?app_user=${app_user}`;
       }
       return url;
     }
