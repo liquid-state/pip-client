@@ -20,7 +20,8 @@ const domainMap: { [key: string]: string } = {
   objectTypes: "/api/v1/object_types/",
   acceptables: "/api/v1/acceptables/",
   acceptances: "/api/v1/acceptances/",
-  users: "/api/admin/v1/users/"
+  users: "/api/admin/v1/users/",
+  app: "/api/admin/v1/apps/"
 };
 
 export default class PIPAdminClient {
@@ -29,14 +30,22 @@ export default class PIPAdminClient {
     this.options = options ? options : defaultOptions;
   }
 
+  getApp = async (appToken: string): Promise<object> => {
+    const url = `${this.getUrl("app")}${appToken}/`;
+    const resp = await fetch(url, { headers: this.headers() });
+    this.verifyResponse(resp);
+    return resp.json();
+  };
+
   getAppUser = async (appUserUISId: string): Promise<object> => {
-    const url = `${this.getUrl("users")}${appUserUISId}`;
+    const url = `${this.getUrl("users")}${appUserUISId}/`;
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
   };
 
   createAppUser = async (
+    appUUID: string,
     appUserUISId: string,
     userType?: string,
     code?: string
@@ -46,6 +55,7 @@ export default class PIPAdminClient {
       method: "POST",
       headers: this.headers(),
       body: JSON.stringify({
+        app: appUUID,
         app_user_id: appUserUISId,
         user_type: userType || "",
         code: code || ""
