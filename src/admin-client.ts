@@ -1,4 +1,4 @@
-import { ObjectType, PIPObject } from './types';
+import { ObjectType, PIPObject } from "./types";
 
 interface IOptions {
   apiRoot?: string;
@@ -10,17 +10,17 @@ interface IdentityOptions {
 }
 
 const defaultOptions = {
-  apiRoot: 'https://pip.liquid-state.com/',
+  apiRoot: "https://pip.liquid-state.com/"
 };
 
 // Basic map of pip urls when using an apiRoot
 const domainMap: { [key: string]: string } = {
-  validateCode: '/api/v1/codes/exchange/',
-  registerCode: '/api/v1/codes/register/',
-  objectTypes: '/api/v1/object_types/',
-  acceptables: '/api/v1/acceptables/',
-  acceptances: '/api/v1/acceptances/',
-  users: '/api/admin/v1/users/',
+  validateCode: "/api/v1/codes/exchange/",
+  registerCode: "/api/v1/codes/register/",
+  objectTypes: "/api/v1/object_types/",
+  acceptables: "/api/v1/acceptables/",
+  acceptances: "/api/v1/acceptances/",
+  users: "/api/admin/v1/users/"
 };
 
 export default class PIPAdminClient {
@@ -30,47 +30,73 @@ export default class PIPAdminClient {
   }
 
   getAppUser = async (appUserUISId: string): Promise<object> => {
-    const url = `${this.getUrl('users')}${appUserUISId}`;
+    const url = `${this.getUrl("users")}${appUserUISId}`;
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
-  }
+  };
+
+  createAppUser = async (
+    appUserUISId: string,
+    userType?: string,
+    code?: string
+  ): Promise<object> => {
+    const url = `${this.getUrl("users")}`;
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: this.headers(),
+      body: JSON.stringify({
+        app_user_id: appUserUISId,
+        user_type: userType || "",
+        code: code || ""
+      })
+    });
+    this.verifyResponse(resp);
+    return resp.json();
+  };
 
   listObjectTypes = async (): Promise<ObjectType[]> => {
-    const url = this.getUrl('objectTypes');
+    const url = this.getUrl("objectTypes");
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     const types = (await resp.json()) as ObjectType[];
     // Return children and parents as object type keys instead of urls.
-    const getKey = (url: string) => url.substr(url.lastIndexOf('/') + 1);
+    const getKey = (url: string) => url.substr(url.lastIndexOf("/") + 1);
     return types.map(type => ({
       ...type,
       children: type.children.map(getKey),
-      parents: type.parents.map(getKey),
+      parents: type.parents.map(getKey)
     }));
   };
 
   getObjectType = async (key: string): Promise<ObjectType> => {
-    const url = `${this.getUrl('objectTypes')}${key}/`;
+    const url = `${this.getUrl("objectTypes")}${key}/`;
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     const objectType = (await resp.json()) as ObjectType;
     // Return children and parents as object type keys instead of urls.
-    const getKey = (url: string) => url.substr(url.lastIndexOf('/') + 1);
+    const getKey = (url: string) => url.substr(url.lastIndexOf("/") + 1);
     objectType.children = objectType.children.map(getKey);
     objectType.parents = objectType.parents.map(getKey);
     return objectType;
   };
 
-  getObjectsForType = async <T>(type: ObjectType | string, version?: string, users?: string[]): Promise<PIPObject<T>[]> => {
+  getObjectsForType = async <T>(
+    type: ObjectType | string,
+    version?: string,
+    users?: string[]
+  ): Promise<PIPObject<T>[]> => {
     const url = this.buildObjectsUrl(type, version, users);
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
   };
 
-  describeVersionsForType = async <T>(type: string, version?: string): Promise<PIPObject<T>[]> => {
-    const url = `${this.getUrl('objectTypes')}${type}/describe_versions/`;
+  describeVersionsForType = async <T>(
+    type: string,
+    version?: string
+  ): Promise<PIPObject<T>[]> => {
+    const url = `${this.getUrl("objectTypes")}${type}/describe_versions/`;
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
@@ -80,22 +106,26 @@ export default class PIPAdminClient {
     type: ObjectType | string,
     users: string[]
   ): Promise<PIPObject<T>[]> => {
-    const url = this.buildObjectsUrl(type, 'latest', users);
+    const url = this.buildObjectsUrl(type, "latest", users);
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
   };
 
-  createObject = async <T>(type: ObjectType | string, json: object, app_user?: string): Promise<PIPObject<T>> => {
+  createObject = async <T>(
+    type: ObjectType | string,
+    json: object,
+    app_user?: string
+  ): Promise<PIPObject<T>> => {
     const url = this.buildObjectsUrl(type);
 
     const resp = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: this.headers(),
       body: JSON.stringify({
         app_user: app_user || null,
-        json,
-      }),
+        json
+      })
     });
     this.verifyResponse(resp);
     return resp.json();
@@ -107,17 +137,17 @@ export default class PIPAdminClient {
     parents?: string[],
     children?: string[]
   ): Promise<ObjectType> => {
-    const url = this.getUrl('objectTypes');
+    const url = this.getUrl("objectTypes");
 
     const resp = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: this.headers(),
       body: JSON.stringify({
         name,
         app,
         children: children || [],
-        parents: parents || [],
-      }),
+        parents: parents || []
+      })
     });
     this.verifyResponse(resp);
     return resp.json();
@@ -140,8 +170,8 @@ export default class PIPAdminClient {
       : `Token ${this.identity.apiKey}`;
     return {
       Authorization: auth,
-      'Content-Type': 'application/json',
-      ...extraHeaders,
+      "Content-Type": "application/json",
+      ...extraHeaders
     };
   }
 
@@ -151,14 +181,18 @@ export default class PIPAdminClient {
     }
   }
 
-  private buildObjectsUrl(objectType: ObjectType | string, version?: string, users?: string[]) {
-    let baseUrl = '';
-    if (typeof objectType !== 'string') {
+  private buildObjectsUrl(
+    objectType: ObjectType | string,
+    version?: string,
+    users?: string[]
+  ) {
+    let baseUrl = "";
+    if (typeof objectType !== "string") {
       baseUrl = objectType.objects;
     } else {
-      baseUrl = `${this.getUrl('objectTypes')}${objectType}/objects/`;
+      baseUrl = `${this.getUrl("objectTypes")}${objectType}/objects/`;
     }
-    if (version === 'latest') {
+    if (version === "latest") {
       let url = `${baseUrl}${version}/`;
       if (users) {
         url = `${url}?app_users=${JSON.stringify(users)}`;
