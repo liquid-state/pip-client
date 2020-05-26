@@ -104,11 +104,16 @@ export default class PIPAdminClient {
 
   describeVersionsForType = async <T>(
     type: string,
-    app_user?: string
+    appUser?: string,
+    appUserObjectTypes?: string[]
   ): Promise<PIPObject<T>[]> => {
-    const url = `${this.getUrl(
-      "objectTypes"
-    )}${type}/describe_versions/?app_user=${app_user}`;
+    let url = `${this.getUrl("objectTypes")}${type}/describe_versions/`;
+    if (appUser) {
+      url += `?app_user=${appUser}`;
+      if (appUserObjectTypes) {
+        url += `&app_user_object_types=${appUserObjectTypes.join(",")}`;
+      }
+    }
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
