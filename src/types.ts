@@ -36,20 +36,17 @@ export interface PrivateInformationProvider {
   consumeCode(code: string, appUserId: string, jwt: JWT): Promise<void>;
   register(jwt: JWT): Promise<void>;
   getObjectType(key: string, jwt: JWT): Promise<ObjectType>;
-  getObjectsForType<T>(
-    type: ObjectType,
-    jwt: JWT,
-    version?: string
-  ): Promise<PIPObject<T>[]>;
+  getObjectsForType<T>(type: ObjectType, jwt: JWT, version?: string): Promise<PIPObject<T>[]>;
   getLatestObjectForType<T>(
     type: ObjectType,
     jwt: JWT,
-    includeNullAppUser?: boolean
+    includeNullAppUser?: boolean,
   ): Promise<PIPObject<T>>;
   updateObject<T>(type: ObjectType, data: T, jwt: JWT): Promise<PIPObject<T>>;
   getAcceptable(id: string, jwt: JWT, version?: string): Promise<Acceptable>;
   sendAcceptance(acceptable: Acceptable, jwt: JWT): Promise<void>;
   userHasAccepted(acceptable: Acceptable, jwt: JWT): Promise<boolean>;
+  getUser(sub: string, jwt: JWT): Promise<PIPUserResponse>;
 }
 
 export interface IPIPService {
@@ -83,3 +80,20 @@ export interface IPIPForm {
   form(): Promise<FormResponse>;
   submit(formData: object, extraData?: object): Promise<object>;
 }
+
+export type PIPUser = {
+  app: string;
+  app_user_id: string;
+  codes: any[];
+  url: string;
+  user_type?: string;
+  username?: string;
+  uuid: string;
+};
+
+export type PIPUserResponse = {
+  count: number;
+  next?: string;
+  previous?: string;
+  results: PIPUser[];
+};
