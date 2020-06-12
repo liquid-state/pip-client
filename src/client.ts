@@ -1,4 +1,10 @@
-import { PrivateInformationProvider, JWT, ObjectType, PIPObject, Acceptable } from './types';
+import {
+  PrivateInformationProvider,
+  JWT,
+  ObjectType,
+  PIPObject,
+  Acceptable
+} from "./types";
 
 export type PIPOptions = {
   apiRoot?: string;
@@ -8,12 +14,12 @@ export type PIPOptions = {
 
 // Basic map of pip urls when using an apiRoot
 const domainMap: { [key: string]: string } = {
-  registerWithoutCode: '/api/v1/users/',
-  validateCode: '/api/v1/codes/exchange/',
-  registerCode: '/api/v1/codes/register/',
-  objectTypes: '/api/v1/object_types/',
-  acceptables: '/api/v1/acceptables/',
-  acceptances: '/api/v1/acceptances/',
+  registerWithoutCode: "/api/v1/users/",
+  validateCode: "/api/v1/codes/exchange/",
+  registerCode: "/api/v1/codes/register/",
+  objectTypes: "/api/v1/object_types/",
+  acceptables: "/api/v1/acceptables/",
+  acceptances: "/api/v1/acceptances/"
 };
 
 export default class PIPClient implements PrivateInformationProvider {
@@ -21,63 +27,70 @@ export default class PIPClient implements PrivateInformationProvider {
 
   constructor(private options: PIPOptions) {
     if (!this.options.apiRoot && !this.options.als) {
-      throw 'You must provide either an apiRoot or als to create a pip client';
+      throw "You must provide either an apiRoot or als to create a pip client";
     }
-    if (this.options.apiRoot && this.options.apiRoot.endsWith('/')) {
-      this.options.apiRoot = this.options.apiRoot.slice(0, this.options.apiRoot.length - 1);
+    if (this.options.apiRoot && this.options.apiRoot.endsWith("/")) {
+      this.options.apiRoot = this.options.apiRoot.slice(
+        0,
+        this.options.apiRoot.length - 1
+      );
     }
 
     this.fetch = this.options.fetch || window.fetch.bind(window);
   }
 
   validateCode = async (code: string): Promise<JWT> => {
-    const url = this.getUrl('validateCode');
+    const url = this.getUrl("validateCode");
     const resp = await this.fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code })
     });
     this.verifyResponse(resp);
     return (await resp.json()).jwt;
   };
 
-  consumeCode = async (code: string, appUserId: string, jwt: JWT): Promise<void> => {
-    const url = this.getUrl('registerCode');
+  consumeCode = async (
+    code: string,
+    appUserId: string,
+    jwt: JWT
+  ): Promise<void> => {
+    const url = this.getUrl("registerCode");
     const resp = await this.fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: this.headers(jwt),
       body: JSON.stringify({
         app_user_id: appUserId,
-        code,
-      }),
+        code
+      })
     });
     this.verifyResponse(resp);
   };
 
   register = async (jwt: JWT): Promise<void> => {
-    const url = this.getUrl('registerWithoutCode');
+    const url = this.getUrl("registerWithoutCode");
     const resp = await this.fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        jwt,
-      }),
+        jwt
+      })
     });
     this.verifyResponse(resp);
   };
 
   getObjectType = async (key: string, jwt: JWT): Promise<ObjectType> => {
-    const url = `${this.getUrl('objectTypes')}${key}/`;
+    const url = `${this.getUrl("objectTypes")}${key}/`;
     const resp = await this.fetch(url, { headers: this.headers(jwt) });
     this.verifyResponse(resp);
     const objectType = (await resp.json()) as ObjectType;
     // Return children and parents as object type keys instead of urls.
     const getKey = (url: string) => {
-      const split = url.split('/');
+      const split = url.split("/");
       return split[split.length - 2];
     };
     objectType.children = objectType.children.map(getKey);
@@ -96,28 +109,45 @@ export default class PIPClient implements PrivateInformationProvider {
     return resp.json();
   };
 
-  getLatestObjectForType = async <T>(type: ObjectType, jwt: JWT): Promise<PIPObject<T>> => {
-    const url = this.buildObjectsUrl(type.objects, 'latest');
-    const resp = await this.fetch(url, { headers: this.headers(jwt) });
-    this.verifyResponse(resp);
-    return resp.json();
-  };
-
-  updateObject = async <T>(type: ObjectType, data: T, jwt: JWT): Promise<PIPObject<T>> => {
-    const url = type.objects;
+  getLatestObjectForType = async <T>(
+    type: ObjectType,
+    jwt: JWT,
+    includeNullAppUser: boolean = false
+  ): Promise<PIPObject<T>> => {
+    let url = this.buildObjectsUrl(type.objects, "latest");
+    if (includeNullAppUser) {
+      url += "?include_null_app_user=1";
+    }
     const resp = await this.fetch(url, {
-      method: 'POST',
-      headers: this.headers(jwt),
-      body: JSON.stringify({
-        json: data,
-      }),
+      headers: this.headers(jwt)
     });
     this.verifyResponse(resp);
     return resp.json();
   };
 
-  getAcceptable = async (id: string, jwt: JWT, version?: string): Promise<Acceptable> => {
-    const baseUrl = await this.getUrl('acceptables');
+  updateObject = async <T>(
+    type: ObjectType,
+    data: T,
+    jwt: JWT
+  ): Promise<PIPObject<T>> => {
+    const url = type.objects;
+    const resp = await this.fetch(url, {
+      method: "POST",
+      headers: this.headers(jwt),
+      body: JSON.stringify({
+        json: data
+      })
+    });
+    this.verifyResponse(resp);
+    return resp.json();
+  };
+
+  getAcceptable = async (
+    id: string,
+    jwt: JWT,
+    version?: string
+  ): Promise<Acceptable> => {
+    const baseUrl = await this.getUrl("acceptables");
     // We only care about the content not the actual acceptable item.
     const url = `${baseUrl}${id}/versions/`;
     let resp = await fetch(url, { headers: this.headers(jwt) });
@@ -127,24 +157,29 @@ export default class PIPClient implements PrivateInformationProvider {
   };
 
   sendAcceptance = async (acceptable: Acceptable, jwt: JWT): Promise<void> => {
-    const baseUrl = await this.getUrl('acceptances');
+    const baseUrl = await this.getUrl("acceptances");
     const body = JSON.stringify({ version: acceptable.uuid });
     let resp = await fetch(baseUrl, {
-      method: 'POST',
+      method: "POST",
       headers: this.headers(jwt),
-      body: body,
+      body: body
     });
     return resp.json();
   };
 
-  userHasAccepted = async (acceptable: Acceptable, jwt: JWT): Promise<boolean> => {
+  userHasAccepted = async (
+    acceptable: Acceptable,
+    jwt: JWT
+  ): Promise<boolean> => {
     const getPage = async (url: string) => {
       const resp = await fetch(url, { headers: this.headers(jwt) });
       return resp.json();
     };
 
     const hasAccepted = async (url: string): Promise<boolean> => {
-      const { next, results }: { results: any[]; next: string } = await getPage(url);
+      const { next, results }: { results: any[]; next: string } = await getPage(
+        url
+      );
       if (results.some(r => r.version === acceptable.url)) {
         return true;
       }
@@ -154,14 +189,14 @@ export default class PIPClient implements PrivateInformationProvider {
       return false;
     };
 
-    const baseUrl = await this.getUrl('acceptances');
+    const baseUrl = await this.getUrl("acceptances");
     return hasAccepted(baseUrl);
   };
 
   private getUrl(name: string) {
     let result;
     if (this.options.als) {
-      result = this.options.als.getUrl('pip', name);
+      result = this.options.als.getUrl("pip", name);
     } else if (name in domainMap) {
       result = `${this.options.apiRoot}${domainMap[name]}`;
     }
@@ -174,8 +209,8 @@ export default class PIPClient implements PrivateInformationProvider {
   private headers(jwt: JWT, extraHeaders = {}) {
     return {
       Authorization: `Bearer ${jwt}`,
-      'Content-Type': 'application/json',
-      ...extraHeaders,
+      "Content-Type": "application/json",
+      ...extraHeaders
     };
   }
 
@@ -186,7 +221,7 @@ export default class PIPClient implements PrivateInformationProvider {
   }
 
   private buildObjectsUrl(baseUrl: string, version?: string) {
-    return version === 'latest'
+    return version === "latest"
       ? `${baseUrl}${version}/`
       : version
         ? `${baseUrl}?version=${version}`

@@ -36,8 +36,16 @@ export interface PrivateInformationProvider {
   consumeCode(code: string, appUserId: string, jwt: JWT): Promise<void>;
   register(jwt: JWT): Promise<void>;
   getObjectType(key: string, jwt: JWT): Promise<ObjectType>;
-  getObjectsForType<T>(type: ObjectType, jwt: JWT, version?: string): Promise<PIPObject<T>[]>;
-  getLatestObjectForType<T>(type: ObjectType, jwt: JWT): Promise<PIPObject<T>>;
+  getObjectsForType<T>(
+    type: ObjectType,
+    jwt: JWT,
+    version?: string
+  ): Promise<PIPObject<T>[]>;
+  getLatestObjectForType<T>(
+    type: ObjectType,
+    jwt: JWT,
+    includeNullAppUser?: boolean
+  ): Promise<PIPObject<T>>;
   updateObject<T>(type: ObjectType, data: T, jwt: JWT): Promise<PIPObject<T>>;
   getAcceptable(id: string, jwt: JWT, version?: string): Promise<Acceptable>;
   sendAcceptance(acceptable: Acceptable, jwt: JWT): Promise<void>;
