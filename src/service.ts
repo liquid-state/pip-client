@@ -5,6 +5,7 @@ import {
   PIPObject,
   IPIPForm,
   IPIPAcceptable,
+  PIPUser,
 } from './types';
 import { IIdentityProvider } from '@liquid-state/iwa-identity/dist/manager';
 import PIPForm from './form';
@@ -42,6 +43,13 @@ export default class PIPService implements IPIPService {
   register = async (): Promise<void> => {
     const jwt = await this.jwt();
     return this.pip.register(jwt);
+  };
+
+  getUser = async (sub: string): Promise<PIPUser> => {
+    const jwt = await this.jwt();
+    const body = await this.pip.getUser(sub, jwt);
+
+    return body.results[0];
   };
 
   getUserData = async <T>(dataType: string): Promise<PIPObject<T>> => {
