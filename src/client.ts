@@ -116,9 +116,7 @@ export default class PIPClient implements PrivateInformationProvider {
     jwt: JWT,
     version?: string,
   ): Promise<PIPObject<T>[]> => {
-    const url = `${this.getUrl('objectTypes')}${this.buildObjectsUrl(
-      typeof type === 'string' ? type : type.objects,
-    )}`;
+    const url = `${this.buildObjectsUrl(type, version)}`;
     const resp = await this.fetch(url, { headers: this.headers(jwt) });
     this.verifyResponse(resp);
     return resp.json();
@@ -129,7 +127,7 @@ export default class PIPClient implements PrivateInformationProvider {
     jwt: JWT,
     includeNullAppUser: boolean = false,
   ): Promise<PIPObject<T>> => {
-    let url = this.buildObjectsUrl(type.objects, 'latest');
+    let url = this.buildObjectsUrl(type, 'latest');
     if (includeNullAppUser) {
       url += '?include_null_app_user=1';
     }
@@ -232,11 +230,25 @@ export default class PIPClient implements PrivateInformationProvider {
     }
   }
 
-  private buildObjectsUrl(baseUrl: string, version?: string) {
-    return version === 'latest'
-      ? `${baseUrl}${version}/`
-      : version
-        ? `${baseUrl}?version=${version}`
-        : baseUrl;
+  private buildObjectsUrl(objectType: ObjectType | string, version?: string) {
+    let baseUrl = '';
+    if (typeof objectType !== 'string') {
+      baseUrl = objectType.objects;
+    } else {
+      baseUrl = `${this.getUrl('objectTypes')}${objectType}/objects/`;
+    }
+    if (version === 'latest') {
+      let url = `${baseUrl}${version}/`;
+      return url;
+    }
+    return version ? `${baseUrl}?version=${version}` : baseUrl;
   }
+
+  // private buildObjectsUrl(baseUrl: string, version?: string) {
+  //   return version === 'latest'
+  //     ? `${baseUrl}${version}/`
+  //     : version
+  //       ? `${baseUrl}?version=${version}`
+  //       : baseUrl;
+  // }
 }
