@@ -1,6 +1,6 @@
 {
   "name": "@liquid-state/pip-client",
-  "version": "1.2.11",
+  "version": "1.2.12",
   "description": "Client library for Liquid State Private Information Providers (PIP)",
   "files": [
     "dist/"
