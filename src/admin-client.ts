@@ -22,6 +22,7 @@ const domainMap: { [key: string]: string } = {
   acceptances: '/api/v1/acceptances/',
   users: '/api/admin/v1/users/',
   app: '/api/admin/v1/apps/',
+  code: '/api/admin/v1/codes/',
 };
 
 export default class PIPAdminClient {
@@ -63,6 +64,17 @@ export default class PIPAdminClient {
     });
     this.verifyResponse(resp);
     return resp.json();
+  };
+
+  createCodeForAppUser = async (userId: string) => {
+    const url = this.getUrl('code');
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: this.headers(),
+      body: JSON.stringify({ app_user: userId, code: this.generateRandomCode() }),
+    });
+
+    return resp;
   };
 
   listObjectTypes = async (): Promise<ObjectType[]> => {
@@ -203,6 +215,13 @@ export default class PIPAdminClient {
     if (!resp.ok) {
       throw Error(`Invalid PIP Response: ${resp}`);
     }
+  }
+
+  private generateRandomCode() {
+    return Math.random()
+      .toString(16)
+      .substring(2, 8)
+      .toUpperCase();
   }
 
   private buildObjectsUrl(objectType: ObjectType | string, version?: string, app_user?: string) {
