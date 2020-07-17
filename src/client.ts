@@ -3,8 +3,9 @@ import {
   JWT,
   ObjectType,
   PIPObject,
-  Acceptable,
+  AcceptableVersion,
   PIPUserResponse,
+  AppUserAcceptable,
 } from './types';
 
 export type PIPOptions = {
@@ -161,46 +162,22 @@ export default class PIPClient implements PrivateInformationProvider {
     return resp.json();
   };
 
-  getAcceptable = async (id: string, jwt: JWT, version?: string): Promise<Acceptable> => {
+  getAcceptable = async (id: string, jwt: JWT, languages?: string[]): Promise<AppUserAcceptable> => {
     const baseUrl = await this.getUrl('acceptables');
-    // We only care about the content not the actual acceptable item.
-    const url = `${baseUrl}${id}/versions/`;
+    const url = `${baseUrl}${id}/${languages && languages.length ? `?language=${languages.join(',')}` : ''}`;
     let resp = await fetch(url, { headers: this.headers(jwt) });
-    let versions = await resp.json();
-    let latest = versions.results ? versions.results[0] : null;
-    return latest;
+    return resp.json();
   };
 
-  sendAcceptance = async (acceptable: Acceptable, jwt: JWT): Promise<void> => {
+  sendAcceptance = async (acceptable: AppUserAcceptable, jwt: JWT): Promise<void> => {
     const baseUrl = await this.getUrl('acceptances');
-    const body = JSON.stringify({ version: acceptable.uuid });
+    const body = JSON.stringify({ version: acceptable.latest_version.uuid });
     let resp = await fetch(baseUrl, {
       method: 'POST',
       headers: this.headers(jwt),
       body: body,
     });
     return resp.json();
-  };
-
-  userHasAccepted = async (acceptable: Acceptable, jwt: JWT): Promise<boolean> => {
-    const getPage = async (url: string) => {
-      const resp = await fetch(url, { headers: this.headers(jwt) });
-      return resp.json();
-    };
-
-    const hasAccepted = async (url: string): Promise<boolean> => {
-      const { next, results }: { results: any[]; next: string } = await getPage(url);
-      if (results.some(r => r.version === acceptable.url)) {
-        return true;
-      }
-      if (next) {
-        return hasAccepted(next);
-      }
-      return false;
-    };
-
-    const baseUrl = await this.getUrl('acceptances');
-    return hasAccepted(baseUrl);
   };
 
   private getUrl(name: string) {
@@ -243,12 +220,4 @@ export default class PIPClient implements PrivateInformationProvider {
     }
     return version ? `${baseUrl}?version=${version}` : baseUrl;
   }
-
-  // private buildObjectsUrl(baseUrl: string, version?: string) {
-  //   return version === 'latest'
-  //     ? `${baseUrl}${version}/`
-  //     : version
-  //       ? `${baseUrl}?version=${version}`
-  //       : baseUrl;
-  // }
 }

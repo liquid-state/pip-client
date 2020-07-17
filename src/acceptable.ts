@@ -1,8 +1,9 @@
 import { identity } from 'lodash';
-import { IPIPAcceptable, PrivateInformationProvider, JWT, Acceptable } from './types';
+import { IPIPAcceptable, PrivateInformationProvider, JWT, AppUserAcceptable, AcceptableVersion } from './types';
+import PIPAdminClient from './admin-client';
 
 export default class implements IPIPAcceptable {
-  private _acceptable: Acceptable;
+  private _acceptable: AppUserAcceptable;
 
   constructor(
     private acceptableId: string,
@@ -10,16 +11,42 @@ export default class implements IPIPAcceptable {
     private jwt: JWT
   ) {}
 
-  async acceptable() {
+  async acceptable(languages?: string[]) {
     if (!this._acceptable) {
-      this._acceptable = await this.pip.getAcceptable(this.acceptableId, this.jwt);
+      this._acceptable = await this.pip.getAcceptable(this.acceptableId, this.jwt, languages);
     }
     return this._acceptable;
   }
 
   async isAccepted() {
     const acceptable = await this.acceptable();
-    return this.pip.userHasAccepted(acceptable, this.jwt);
+    return acceptable.latest_version.number === acceptable.latest_acceptance?.version.number;
+  }
+
+  async accept() {
+    const acceptable = await this.acceptable();
+    await this.pip.sendAcceptance(acceptable, this.jwt);
+  }
+}
+
+export class PIPAdminAcceptable {
+  private _acceptable: AcceptableVersion;
+
+  constructor(
+    private acceptableId: string,
+    private pip: PIPAdminClient,
+  ) {}
+
+  async acceptable() {
+    if (!this._acceptable) {
+      this._acceptable = await this.pip.getAcceptable(this.acceptableId);
+    }
+    return this._acceptable;
+  }
+
+  async isAccepted() {
+    const acceptable = await this.acceptable();
+    return this.pip.userHasAccepted(acceptable);
   }
 
   async content(languages: string[]) {
@@ -36,6 +63,6 @@ export default class implements IPIPAcceptable {
 
   async accept() {
     const acceptable = await this.acceptable();
-    await this.pip.sendAcceptance(acceptable, this.jwt);
+    await this.pip.sendAcceptance(acceptable);
   }
 }

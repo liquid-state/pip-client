@@ -1,4 +1,4 @@
-import { ObjectType, PIPObject } from './types';
+import { ObjectType, PIPObject, AcceptableVersion } from './types';
 
 interface IOptions {
   apiRoot?: string;
@@ -187,6 +187,56 @@ export default class PIPAdminClient {
     });
     this.verifyResponse(resp);
     return resp.json();
+  };
+
+  getAcceptable = async (id: string): Promise<AcceptableVersion> => {
+    const baseUrl = await this.getUrl('acceptables');
+    // We only care about the content not the actual acceptable item.
+    const url = `${baseUrl}${id}/versions/`;
+    let resp = await fetch(url, { headers: this.headers() });
+    let versions = await resp.json();
+    let latest = versions.results ? versions.results[0] : null;
+    if (!latest) {
+      return latest;
+    }
+    const contentResp = await fetch(latest.content, { headers: this.headers() });
+    if (!contentResp.ok) {
+      throw new Error(`Unable to load acceptable version content for acceptable ${id} and version ${latest}`);
+    }
+    latest.content = await contentResp.json();
+    return latest;
+  };
+
+  sendAcceptance = async (acceptable: AcceptableVersion): Promise<void> => {
+    const baseUrl = await this.getUrl('acceptances');
+    const body = JSON.stringify({ version: acceptable.uuid });
+    let resp = await fetch(baseUrl, {
+      method: 'POST',
+      headers: this.headers(),
+      body: body,
+    });
+    return resp.json();
+  };
+
+  userHasAccepted = async (acceptable: AcceptableVersion): Promise<boolean> => {
+    const getPage = async (url: string) => {
+      const resp = await fetch(url, { headers: this.headers() });
+      return resp.json();
+    };
+
+    const hasAccepted = async (url: string): Promise<boolean> => {
+      const { next, results }: { results: any[]; next: string } = await getPage(url);
+      if (results.some(r => r.version === acceptable.url)) {
+        return true;
+      }
+      if (next) {
+        return hasAccepted(next);
+      }
+      return false;
+    };
+
+    const baseUrl = await this.getUrl('acceptances');
+    return hasAccepted(baseUrl);
   };
 
   private getUrl(name: string) {

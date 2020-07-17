@@ -18,11 +18,42 @@ export interface PIPObject<T = object> {
   json: T;
 }
 
-export interface Acceptable {
+export interface AcceptableDocument {
+  type: "document";
+  [key: string]: any
+  product_id: string;
+  version: number;
+  url: string;
+}
+
+export interface AppUserAcceptableVersion {
+  uuid: string
+  number: number;
+  language_code: string;
+  display_name: string;
+  content: string | null;
+  data: AcceptableDocument | { type: string, [key: string]: any }
+}
+
+export interface AppUserAcceptable {
+  name: string;
+  slug: string;
+  url: string;
+  uuid: string;
+  default_content_language_code: string;
+  latest_version: AppUserAcceptableVersion
+  latest_acceptance: {
+    version: AppUserAcceptableVersion
+    created: string
+  } | null
+}
+
+export interface AcceptableVersion {
   url: string;
   uuid: string;
   number: number;
   content: AcceptableContent[];
+  status: string;
 }
 
 export interface AcceptableContent {
@@ -43,9 +74,8 @@ export interface PrivateInformationProvider {
     includeNullAppUser?: boolean,
   ): Promise<PIPObject<T>>;
   updateObject<T>(type: ObjectType, data: T, jwt: JWT): Promise<PIPObject<T>>;
-  getAcceptable(id: string, jwt: JWT, version?: string): Promise<Acceptable>;
-  sendAcceptance(acceptable: Acceptable, jwt: JWT): Promise<void>;
-  userHasAccepted(acceptable: Acceptable, jwt: JWT): Promise<boolean>;
+  getAcceptable(id: string, jwt: JWT, languages?: string[]): Promise<AppUserAcceptable>;
+  sendAcceptance(acceptable: AppUserAcceptable, jwt: JWT): Promise<void>;
   getUser(sub: string, jwt: JWT): Promise<PIPUserResponse>;
 }
 
@@ -61,9 +91,8 @@ export interface IPIPService {
 }
 
 export interface IPIPAcceptable {
-  acceptable(): Promise<Acceptable>;
+  acceptable(languages: string[]): Promise<AppUserAcceptable>;
   isAccepted(): Promise<boolean>;
-  content(languages: string[]): Promise<AcceptableContent>;
   accept(): Promise<void>;
 }
 
