@@ -46,7 +46,7 @@ export class PIPAdminAcceptable {
 
   async isAccepted() {
     const acceptable = await this.acceptable();
-    return this.pip.userHasAccepted(acceptable);
+    return this.pip.currentUserHasAccepted(acceptable);
   }
 
   async content(languages: string[]) {

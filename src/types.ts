@@ -29,6 +29,9 @@ export interface AcceptableDocument {
 export interface AppUserAcceptableVersion {
   uuid: string
   number: number;
+}
+
+export interface AppUserAcceptableContent {
   language_code: string;
   display_name: string;
   content: string | null;
@@ -41,9 +44,11 @@ export interface AppUserAcceptable {
   url: string;
   uuid: string;
   default_content_language_code: string;
-  latest_version: AppUserAcceptableVersion
+  latest_version: AppUserAcceptableVersion & { version_content: AppUserAcceptableContent }
   latest_acceptance: {
+    app_user: string
     version: AppUserAcceptableVersion
+    version_content: AppUserAcceptableContent
     created: string
   } | null
 }

@@ -1,4 +1,5 @@
 import { ObjectType, PIPObject, AcceptableVersion } from './types';
+import acceptable from './acceptable';
 
 interface IOptions {
   apiRoot?: string;
@@ -218,7 +219,7 @@ export default class PIPAdminClient {
     return resp.json();
   };
 
-  userHasAccepted = async (acceptable: AcceptableVersion): Promise<boolean> => {
+  currentUserHasAccepted = async (acceptable: AcceptableVersion): Promise<boolean> => {
     const getPage = async (url: string) => {
       const resp = await fetch(url, { headers: this.headers() });
       return resp.json();
@@ -226,7 +227,7 @@ export default class PIPAdminClient {
 
     const hasAccepted = async (url: string): Promise<boolean> => {
       const { next, results }: { results: any[]; next: string } = await getPage(url);
-      if (results.some(r => r.version === acceptable.url)) {
+      if (results.some(r => r.version.url === acceptable.url)) {
         return true;
       }
       if (next) {
@@ -238,6 +239,26 @@ export default class PIPAdminClient {
     const baseUrl = await this.getUrl('acceptances');
     return hasAccepted(baseUrl);
   };
+
+  listUserAcceptances = async (acceptable: AcceptableVersion, userId: string): Promise<object[]> => {
+    const getPage = async (url: string) => {
+      const resp = await fetch(url, { headers: this.headers() });
+      return resp.json();
+    };
+
+    const acceptances = async (url: string, accumulator: any[] = []): Promise<object[]> => {
+      const { next, results }: { results: any[]; next: string } = await getPage(url);
+      const total = accumulator.concat(results.filter(r => r.version.url === acceptable.url && r.app_user.includes(userId)));
+      
+      if (next) {
+        return acceptances(next, total);
+      }
+      return total;
+    };
+
+    const baseUrl = await this.getUrl('acceptances');
+    return acceptances(baseUrl);
+  }
 
   private getUrl(name: string) {
     let result;
