@@ -1,5 +1,12 @@
 import { identity } from 'lodash';
-import { IPIPAcceptable, PrivateInformationProvider, JWT, AppUserAcceptable, AcceptableVersion } from './types';
+import {
+  IPIPAcceptable,
+  PrivateInformationProvider,
+  JWT,
+  AppUserAcceptable,
+  AcceptableVersion,
+  AcceptableContent,
+} from './types';
 import PIPAdminClient from './admin-client';
 
 export default class implements IPIPAcceptable {
@@ -32,10 +39,7 @@ export default class implements IPIPAcceptable {
 export class PIPAdminAcceptable {
   private _acceptable: AcceptableVersion;
 
-  constructor(
-    private acceptableId: string,
-    private pip: PIPAdminClient,
-  ) {}
+  constructor(private acceptableId: string, private pip: PIPAdminClient) {}
 
   async acceptable() {
     if (!this._acceptable) {
@@ -61,8 +65,8 @@ export class PIPAdminAcceptable {
     return result;
   }
 
-  async accept() {
+  async accept(content: AcceptableContent) {
     const acceptable = await this.acceptable();
-    await this.pip.sendAcceptance(acceptable);
+    await this.pip.sendAcceptance(acceptable, content);
   }
 }

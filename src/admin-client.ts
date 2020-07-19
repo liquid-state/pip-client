@@ -1,4 +1,4 @@
-import { ObjectType, PIPObject, AcceptableVersion } from './types';
+import { ObjectType, PIPObject, AcceptableVersion, AcceptableContent } from './types';
 import acceptable from './acceptable';
 
 interface IOptions {
@@ -50,7 +50,7 @@ export default class PIPAdminClient {
     appUUID: string,
     appUserUISId: string,
     userType?: string,
-    code?: string,
+    code?: string
   ): Promise<object> => {
     const url = `${this.getUrl('users')}`;
     const resp = await fetch(url, {
@@ -107,7 +107,7 @@ export default class PIPAdminClient {
   getObjectsForType = async <T>(
     type: ObjectType | string,
     version?: string,
-    appUser?: string,
+    appUser?: string
   ): Promise<PIPObject<T>[]> => {
     const url = this.buildObjectsUrl(type, version, appUser);
     const resp = await fetch(url, { headers: this.headers() });
@@ -118,7 +118,7 @@ export default class PIPAdminClient {
   describeVersionsForType = async <T>(
     type: string,
     appUser?: string,
-    appUserObjectTypes?: string[],
+    appUserObjectTypes?: string[]
   ): Promise<PIPObject<T>[]> => {
     let url = `${this.getUrl('objectTypes')}${type}/describe_versions/`;
     if (appUser) {
@@ -134,7 +134,7 @@ export default class PIPAdminClient {
 
   getLatestObjectsForUsers = async <T>(
     type: ObjectType | string,
-    appUsers: string[],
+    appUsers: string[]
   ): Promise<PIPObject<T>[]> => {
     let url = this.buildObjectsUrl(type, 'latest');
     if (appUsers) {
@@ -152,7 +152,7 @@ export default class PIPAdminClient {
   createObject = async <T>(
     type: ObjectType | string,
     json: object,
-    app_user?: string,
+    app_user?: string
   ): Promise<PIPObject<T>> => {
     const url = this.buildObjectsUrl(type);
 
@@ -172,7 +172,7 @@ export default class PIPAdminClient {
     name: string,
     app: string,
     parents?: string[],
-    children?: string[],
+    children?: string[]
   ): Promise<ObjectType> => {
     const url = this.getUrl('objectTypes');
 
@@ -202,15 +202,20 @@ export default class PIPAdminClient {
     }
     const contentResp = await fetch(latest.content, { headers: this.headers() });
     if (!contentResp.ok) {
-      throw new Error(`Unable to load acceptable version content for acceptable ${id} and version ${latest}`);
+      throw new Error(
+        `Unable to load acceptable version content for acceptable ${id} and version ${latest}`
+      );
     }
     latest.content = await contentResp.json();
     return latest;
   };
 
-  sendAcceptance = async (acceptable: AcceptableVersion): Promise<void> => {
+  sendAcceptance = async (
+    acceptable: AcceptableVersion,
+    content: AcceptableContent
+  ): Promise<void> => {
     const baseUrl = await this.getUrl('acceptances');
-    const body = JSON.stringify({ version: acceptable.uuid });
+    const body = JSON.stringify({ version: acceptable.uuid, version_content: content.uuid });
     let resp = await fetch(baseUrl, {
       method: 'POST',
       headers: this.headers(),
@@ -240,7 +245,10 @@ export default class PIPAdminClient {
     return hasAccepted(baseUrl);
   };
 
-  listUserAcceptances = async (acceptable: AcceptableVersion, userId: string): Promise<object[]> => {
+  listUserAcceptances = async (
+    acceptable: AcceptableVersion,
+    userId: string
+  ): Promise<object[]> => {
     const getPage = async (url: string) => {
       const resp = await fetch(url, { headers: this.headers() });
       return resp.json();
@@ -248,8 +256,10 @@ export default class PIPAdminClient {
 
     const acceptances = async (url: string, accumulator: any[] = []): Promise<object[]> => {
       const { next, results }: { results: any[]; next: string } = await getPage(url);
-      const total = accumulator.concat(results.filter(r => r.version.url === acceptable.url && r.app_user.includes(userId)));
-      
+      const total = accumulator.concat(
+        results.filter(r => r.version.url === acceptable.url && r.app_user.includes(userId))
+      );
+
       if (next) {
         return acceptances(next, total);
       }
@@ -258,7 +268,7 @@ export default class PIPAdminClient {
 
     const baseUrl = await this.getUrl('acceptances');
     return acceptances(baseUrl);
-  }
+  };
 
   private getUrl(name: string) {
     let result;

@@ -3,7 +3,6 @@ import {
   JWT,
   ObjectType,
   PIPObject,
-  AcceptableVersion,
   PIPUserResponse,
   AppUserAcceptable,
 } from './types';
@@ -69,7 +68,7 @@ export default class PIPClient implements PrivateInformationProvider {
     type: string,
     jwt: JWT,
     appUser?: string,
-    appUserObjectTypes?: string[],
+    appUserObjectTypes?: string[]
   ): Promise<PIPObject<T>[]> => {
     let url = `${this.getUrl('objectTypes')}${type}/describe_versions/`;
     if (appUser) {
@@ -115,7 +114,7 @@ export default class PIPClient implements PrivateInformationProvider {
   getObjectsForType = async <T>(
     type: ObjectType | string,
     jwt: JWT,
-    version?: string,
+    version?: string
   ): Promise<PIPObject<T>[]> => {
     const url = `${this.buildObjectsUrl(type, version)}`;
     const resp = await this.fetch(url, { headers: this.headers(jwt) });
@@ -126,7 +125,7 @@ export default class PIPClient implements PrivateInformationProvider {
   getLatestObjectForType = async <T>(
     type: ObjectType,
     jwt: JWT,
-    includeNullAppUser: boolean = false,
+    includeNullAppUser: boolean = false
   ): Promise<PIPObject<T>> => {
     let url = this.buildObjectsUrl(type, 'latest');
     if (includeNullAppUser) {
@@ -162,16 +161,25 @@ export default class PIPClient implements PrivateInformationProvider {
     return resp.json();
   };
 
-  getAcceptable = async (id: string, jwt: JWT, languages?: string[]): Promise<AppUserAcceptable> => {
+  getAcceptable = async (
+    id: string,
+    jwt: JWT,
+    languages?: string[]
+  ): Promise<AppUserAcceptable> => {
     const baseUrl = await this.getUrl('acceptables');
-    const url = `${baseUrl}${id}/${languages && languages.length ? `?language=${languages.join(',')}` : ''}`;
+    const url = `${baseUrl}${id}/${
+      languages && languages.length ? `?language=${languages.join(',')}` : ''
+    }`;
     let resp = await fetch(url, { headers: this.headers(jwt) });
     return resp.json();
   };
 
   sendAcceptance = async (acceptable: AppUserAcceptable, jwt: JWT): Promise<void> => {
     const baseUrl = await this.getUrl('acceptances');
-    const body = JSON.stringify({ version: acceptable.latest_version.uuid });
+    const body = JSON.stringify({
+      version: acceptable.latest_version.uuid,
+      version_content: acceptable.latest_version.version_content.uuid,
+    });
     let resp = await fetch(baseUrl, {
       method: 'POST',
       headers: this.headers(jwt),

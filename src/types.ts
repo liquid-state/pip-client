@@ -19,23 +19,24 @@ export interface PIPObject<T = object> {
 }
 
 export interface AcceptableDocument {
-  type: "document";
-  [key: string]: any
+  type: 'document';
+  [key: string]: any;
   product_id: string;
   version: number;
   url: string;
 }
 
 export interface AppUserAcceptableVersion {
-  uuid: string
+  uuid: string;
   number: number;
 }
 
 export interface AppUserAcceptableContent {
+  uuid: string;
   language_code: string;
   display_name: string;
   content: string | null;
-  data: AcceptableDocument | { type: string, [key: string]: any }
+  data: AcceptableDocument | { type: string; [key: string]: any };
 }
 
 export interface AppUserAcceptable {
@@ -44,13 +45,13 @@ export interface AppUserAcceptable {
   url: string;
   uuid: string;
   default_content_language_code: string;
-  latest_version: AppUserAcceptableVersion & { version_content: AppUserAcceptableContent }
+  latest_version: AppUserAcceptableVersion & { version_content: AppUserAcceptableContent };
   latest_acceptance: {
-    app_user: string
-    version: AppUserAcceptableVersion
-    version_content: AppUserAcceptableContent
-    created: string
-  } | null
+    app_user: string;
+    version: AppUserAcceptableVersion;
+    version_content: AppUserAcceptableContent;
+    created: string;
+  } | null;
 }
 
 export interface AcceptableVersion {
@@ -62,6 +63,7 @@ export interface AcceptableVersion {
 }
 
 export interface AcceptableContent {
+  uuid: string;
   language_code: string;
   display_name: string;
   content: string;
@@ -76,7 +78,7 @@ export interface PrivateInformationProvider {
   getLatestObjectForType<T>(
     type: ObjectType,
     jwt: JWT,
-    includeNullAppUser?: boolean,
+    includeNullAppUser?: boolean
   ): Promise<PIPObject<T>>;
   updateObject<T>(type: ObjectType, data: T, jwt: JWT): Promise<PIPObject<T>>;
   getAcceptable(id: string, jwt: JWT, languages?: string[]): Promise<AppUserAcceptable>;
