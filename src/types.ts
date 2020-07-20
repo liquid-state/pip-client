@@ -66,7 +66,8 @@ export interface AcceptableContent {
   uuid: string;
   language_code: string;
   display_name: string;
-  content: string;
+  content: string | null;
+  data: AcceptableDocument | { type: string; [key: string]: any };
 }
 
 export interface PrivateInformationProvider {

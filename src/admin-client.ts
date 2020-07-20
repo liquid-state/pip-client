@@ -190,13 +190,13 @@ export default class PIPAdminClient {
     return resp.json();
   };
 
-  getAcceptable = async (id: string): Promise<AcceptableVersion> => {
+  getAcceptable = async (id: string, onlyReady= false): Promise<AcceptableVersion> => {
     const baseUrl = await this.getUrl('acceptables');
     // We only care about the content not the actual acceptable item.
     const url = `${baseUrl}${id}/versions/`;
     let resp = await fetch(url, { headers: this.headers() });
     let versions = await resp.json();
-    let latest = versions.results ? versions.results[0] : null;
+    let latest = versions.results ? versions.results.filter((v: any) => onlyReady ? v.status === 'ready' : true) : null;
     if (!latest) {
       return latest;
     }
