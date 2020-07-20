@@ -248,7 +248,7 @@ export default class PIPAdminClient {
   };
 
   listUserAcceptances = async (
-    acceptable: AcceptableVersion,
+    acceptable: string,
     userId: string
   ): Promise<object[]> => {
     const getPage = async (url: string) => {
@@ -258,9 +258,13 @@ export default class PIPAdminClient {
 
     const acceptances = async (url: string, accumulator: any[] = []): Promise<object[]> => {
       const { next, results }: { results: any[]; next: string } = await getPage(url);
-      const total = accumulator.concat(
-        results.filter(r => r.version.url === acceptable.url && r.app_user.includes(userId))
-      );
+      const selected = results.filter(r => r.version.includes(acceptable));
+      for (const item of selected) {
+        item.version = await getPage(item.version);
+        item.version_content = await getPage(item.version_content);
+      }
+      
+      const total = accumulator.concat(selected);
 
       if (next) {
         return acceptances(next, total);
@@ -269,7 +273,7 @@ export default class PIPAdminClient {
     };
 
     const baseUrl = await this.getUrl('acceptances');
-    return acceptances(baseUrl);
+    return acceptances(`${baseUrl}?app_user_id=${userId}`);
   };
 
   private getUrl(name: string) {
