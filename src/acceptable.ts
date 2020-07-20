@@ -56,6 +56,7 @@ export class PIPAdminAcceptable {
   async content(languages: string[]) {
     const acceptable = await this.acceptable();
     const content = acceptable.content;
+    console.log('Content', content);
     // Map languages to the matching acceptable data,
     // return the first one which is not undefined.
     const result = languages.map(lng => content.find(c => c.language_code === lng)).find(identity);

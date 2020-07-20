@@ -190,13 +190,15 @@ export default class PIPAdminClient {
     return resp.json();
   };
 
-  getAcceptable = async (id: string, onlyReady= false): Promise<AcceptableVersion> => {
+  getAcceptable = async (id: string, onlyReady = false): Promise<AcceptableVersion> => {
     const baseUrl = await this.getUrl('acceptables');
     // We only care about the content not the actual acceptable item.
     const url = `${baseUrl}${id}/versions/`;
     let resp = await fetch(url, { headers: this.headers() });
     let versions = await resp.json();
-    let latest = versions.results ? versions.results.filter((v: any) => onlyReady ? v.status === 'ready' : true) : null;
+    let latest = versions.results
+      ? versions.results.filter((v: any) => (onlyReady ? v.status === 'ready' : true))[0]
+      : null;
     if (!latest) {
       return latest;
     }
@@ -206,7 +208,7 @@ export default class PIPAdminClient {
         `Unable to load acceptable version content for acceptable ${id} and version ${latest}`
       );
     }
-    latest.content = await contentResp.json();
+    latest.content = (await contentResp.json()).results;
     return latest;
   };
 
