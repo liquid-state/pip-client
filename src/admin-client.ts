@@ -134,14 +134,22 @@ export default class PIPAdminClient {
 
   getLatestObjectsForUsers = async <T>(
     type: ObjectType | string,
-    appUsers: string[]
+    appUsers?: string[],
+    filters?: {
+      status?: string[],
+      excludeStatus?: string[],
+    }
   ): Promise<PIPObject<T>[]> => {
     let url = this.buildObjectsUrl(type, 'latest');
     if (appUsers) {
-      if (appUsers.length === 1) {
-        url = this.buildObjectsUrl(type, 'latest', appUsers[0]);
-      } else {
         url = `${url}?app_users=${JSON.stringify(appUsers)}}`;
+    }
+    if (filters) {
+      if (filters.status) {
+        url = `${url}&status=${filters.status.join(',')}`
+      }
+      if (filters.excludeStatus) {
+        url = `${url}&exclude_status=${filters.excludeStatus.join(',')}`
       }
     }
     const resp = await fetch(url, { headers: this.headers() });
