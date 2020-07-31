@@ -36,7 +36,7 @@ export interface AppUserAcceptableContent {
   language_code: string;
   display_name: string;
   content: string | null;
-  data: AcceptableDocument | { type: string; [key: string]: any };
+  data: AcceptableDocument | { type: string;[key: string]: any };
 }
 
 export interface AppUserAcceptable {
@@ -67,7 +67,7 @@ export interface AcceptableContent {
   language_code: string;
   display_name: string;
   content: string | null;
-  data: AcceptableDocument | { type: string; [key: string]: any };
+  data: AcceptableDocument | { type: string;[key: string]: any };
 }
 
 export interface PrivateInformationProvider {
@@ -81,7 +81,7 @@ export interface PrivateInformationProvider {
     jwt: JWT,
     includeNullAppUser?: boolean
   ): Promise<PIPObject<T>>;
-  updateObject<T>(type: ObjectType, data: T, jwt: JWT): Promise<PIPObject<T>>;
+  updateObject<T>(type: ObjectType, data: T, jwt: JWT, status?: string): Promise<PIPObject<T>>;
   getAcceptable(id: string, jwt: JWT, languages?: string[]): Promise<AppUserAcceptable>;
   sendAcceptance(acceptable: AppUserAcceptable, jwt: JWT): Promise<void>;
   getUser(sub: string, jwt: JWT): Promise<PIPUserResponse>;
@@ -92,7 +92,7 @@ export interface IPIPService {
   consumeCode(code: string, userId: string): Promise<void>;
   register(): Promise<void>;
   getUserData<T>(dataType: string): Promise<PIPObject<T>>;
-  putUserData<T>(dataType: string, data: T): Promise<PIPObject<T>>;
+  putUserData<T>(dataType: string, data: T, status?: string): Promise<PIPObject<T>>;
   raw(url: string, init: RequestInit): Promise<Response>;
   form(id: string): Promise<IPIPForm>;
   acceptable(id: string): Promise<IPIPAcceptable>;

@@ -148,7 +148,7 @@ export default class PIPClient implements PrivateInformationProvider {
     return resp.json();
   };
 
-  updateObject = async <T>(type: ObjectType, data: T, jwt: JWT): Promise<PIPObject<T>> => {
+  updateObject = async <T>(type: ObjectType, data: T, jwt: JWT, status?: string): Promise<PIPObject<T>> => {
     const url = type.objects;
     const resp = await this.fetch(url, {
       method: 'POST',
@@ -169,7 +169,7 @@ export default class PIPClient implements PrivateInformationProvider {
     const baseUrl = await this.getUrl('acceptables');
     const url = `${baseUrl}${id}/${
       languages && languages.length ? `?language=${languages.join(',')}` : ''
-    }`;
+      }`;
     let resp = await fetch(url, { headers: this.headers(jwt) });
     return resp.json();
   };

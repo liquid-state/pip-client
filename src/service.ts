@@ -19,7 +19,7 @@ export type IdentityOptions = {
 export default class PIPService implements IPIPService {
   private _jwt: string | undefined = undefined;
 
-  constructor(private pip: PrivateInformationProvider, private identity: IdentityOptions) {}
+  constructor(private pip: PrivateInformationProvider, private identity: IdentityOptions) { }
 
   form = async (id: string): Promise<IPIPForm> => {
     return new PIPForm(id, this.pip, await this.jwt());
@@ -58,10 +58,10 @@ export default class PIPService implements IPIPService {
     return this.pip.getLatestObjectForType<T>(objectType, jwt);
   };
 
-  putUserData = async <T>(dataType: string, data: T): Promise<PIPObject<T>> => {
+  putUserData = async <T>(dataType: string, data: T, status?: string): Promise<PIPObject<T>> => {
     const jwt = await this.jwt();
     const objectType = await this.pip.getObjectType(dataType, jwt);
-    return this.pip.updateObject(objectType, data, jwt);
+    return this.pip.updateObject(objectType, data, jwt, status);
   };
 
   /* Provides an interface for calling pip directly.

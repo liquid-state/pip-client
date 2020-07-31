@@ -16,7 +16,7 @@ export default class implements IPIPAcceptable {
     private acceptableId: string,
     private pip: PrivateInformationProvider,
     private jwt: JWT
-  ) {}
+  ) { }
 
   async acceptable(languages?: string[]) {
     if (!this._acceptable) {
@@ -25,9 +25,9 @@ export default class implements IPIPAcceptable {
     return this._acceptable;
   }
 
-  async isAccepted() {
+  async isAccepted(): Promise<boolean> {
     const acceptable = await this.acceptable();
-    return acceptable.latest_version.number === acceptable.latest_acceptance?.version.number;
+    return acceptable.latest_version.number === acceptable.latest_acceptance?.version.number ? true : false
   }
 
   async accept() {
@@ -39,7 +39,7 @@ export default class implements IPIPAcceptable {
 export class PIPAdminAcceptable {
   private _acceptable: AcceptableVersion;
 
-  constructor(private acceptableId: string, private pip: PIPAdminClient) {}
+  constructor(private acceptableId: string, private pip: PIPAdminClient) { }
 
   async acceptable() {
     if (!this._acceptable) {
