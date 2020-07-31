@@ -155,6 +155,7 @@ export default class PIPClient implements PrivateInformationProvider {
       headers: this.headers(jwt),
       body: JSON.stringify({
         json: data,
+        status,
       }),
     });
     this.verifyResponse(resp);

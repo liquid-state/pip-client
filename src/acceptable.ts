@@ -25,9 +25,9 @@ export default class implements IPIPAcceptable {
     return this._acceptable;
   }
 
-  async isAccepted(): Promise<boolean> {
+  async isAccepted() {
     const acceptable = await this.acceptable();
-    return acceptable.latest_version.number === acceptable.latest_acceptance?.version.number ? true : false
+    return acceptable.latest_version.number === acceptable.latest_acceptance?.version.number;
   }
 
   async accept() {
