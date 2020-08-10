@@ -1,5 +1,12 @@
-import { ObjectType, PIPObject, AcceptableVersion, AcceptableContent } from './types';
+import {
+  ObjectType,
+  PIPObject,
+  AcceptableItem,
+  AcceptableVersion,
+  AcceptableContent,
+} from './types';
 import acceptable from './acceptable';
+import { Acceptable } from '.';
 
 interface IOptions {
   apiRoot?: string;
@@ -50,7 +57,7 @@ export default class PIPAdminClient {
     appUUID: string,
     appUserUISId: string,
     userType?: string,
-    code?: string
+    code?: string,
   ): Promise<object> => {
     const url = `${this.getUrl('users')}`;
     const resp = await fetch(url, {
@@ -107,7 +114,7 @@ export default class PIPAdminClient {
   getObjectsForType = async <T>(
     type: ObjectType | string,
     version?: string,
-    appUser?: string
+    appUser?: string,
   ): Promise<PIPObject<T>[]> => {
     const url = this.buildObjectsUrl(type, version, appUser);
     const resp = await fetch(url, { headers: this.headers() });
@@ -118,7 +125,7 @@ export default class PIPAdminClient {
   describeVersionsForType = async <T>(
     type: string,
     appUser?: string,
-    appUserObjectTypes?: string[]
+    appUserObjectTypes?: string[],
   ): Promise<PIPObject<T>[]> => {
     let url = `${this.getUrl('objectTypes')}${type}/describe_versions/`;
     if (appUser) {
@@ -136,20 +143,20 @@ export default class PIPAdminClient {
     type: ObjectType | string,
     appUsers?: string[],
     filters?: {
-      status?: string[],
-      excludeStatus?: string[],
-    }
+      status?: string[];
+      excludeStatus?: string[];
+    },
   ): Promise<PIPObject<T>[]> => {
     let url = this.buildObjectsUrl(type, 'latest');
     if (appUsers) {
-        url = `${url}?app_users=${JSON.stringify(appUsers)}}`;
+      url = `${url}?app_users=${JSON.stringify(appUsers)}}`;
     }
     if (filters) {
       if (filters.status) {
-        url = `${url}&status=${filters.status.join(',')}`
+        url = `${url}&status=${filters.status.join(',')}`;
       }
       if (filters.excludeStatus) {
-        url = `${url}&exclude_status=${filters.excludeStatus.join(',')}`
+        url = `${url}&exclude_status=${filters.excludeStatus.join(',')}`;
       }
     }
     const resp = await fetch(url, { headers: this.headers() });
@@ -160,7 +167,7 @@ export default class PIPAdminClient {
   createObject = async <T>(
     type: ObjectType | string,
     json: object,
-    app_user?: string
+    app_user?: string,
   ): Promise<PIPObject<T>> => {
     const url = this.buildObjectsUrl(type);
 
@@ -180,7 +187,7 @@ export default class PIPAdminClient {
     name: string,
     app: string,
     parents?: string[],
-    children?: string[]
+    children?: string[],
   ): Promise<ObjectType> => {
     const url = this.getUrl('objectTypes');
 
@@ -198,7 +205,20 @@ export default class PIPAdminClient {
     return resp.json();
   };
 
+  getAcceptableItem = async (id: string): Promise<AcceptableItem> => {
+    const baseUrl = await this.getUrl('acceptables');
+    // We only care about the content not the actual acceptable item.
+    const url = `${baseUrl}${id}/`;
+    let resp = await fetch(url, { headers: this.headers() });
+    if (!resp.ok) {
+      throw new Error(`Unable to get AcceptableItem with id ${id}`);
+    }
+    let acceptableData = await resp.json();
+    return acceptableData;
+  };
+
   getAcceptable = async (id: string, onlyReady = false): Promise<AcceptableVersion> => {
+    // Note: sadfdsfa
     const baseUrl = await this.getUrl('acceptables');
     // We only care about the content not the actual acceptable item.
     const url = `${baseUrl}${id}/versions/`;
@@ -213,7 +233,7 @@ export default class PIPAdminClient {
     const contentResp = await fetch(latest.content, { headers: this.headers() });
     if (!contentResp.ok) {
       throw new Error(
-        `Unable to load acceptable version content for acceptable ${id} and version ${latest}`
+        `Unable to load acceptable version content for acceptable ${id} and version ${latest}`,
       );
     }
     latest.content = (await contentResp.json()).results;
@@ -222,7 +242,7 @@ export default class PIPAdminClient {
 
   sendAcceptance = async (
     acceptable: AcceptableVersion,
-    content: AcceptableContent
+    content: AcceptableContent,
   ): Promise<void> => {
     const baseUrl = await this.getUrl('acceptances');
     const body = JSON.stringify({ version: acceptable.uuid, version_content: content.uuid });
@@ -255,10 +275,7 @@ export default class PIPAdminClient {
     return hasAccepted(baseUrl);
   };
 
-  listUserAcceptances = async (
-    acceptable: string,
-    userId: string
-  ): Promise<object[]> => {
+  listUserAcceptances = async (acceptable: string, userId: string): Promise<object[]> => {
     const getPage = async (url: string) => {
       const resp = await fetch(url, { headers: this.headers() });
       return resp.json();
@@ -271,7 +288,7 @@ export default class PIPAdminClient {
         item.version = await getPage(item.version);
         item.version_content = await getPage(item.version_content);
       }
-      
+
       const total = accumulator.concat(selected);
 
       if (next) {

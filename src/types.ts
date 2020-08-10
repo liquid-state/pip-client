@@ -36,7 +36,7 @@ export interface AppUserAcceptableContent {
   language_code: string;
   display_name: string;
   content: string | null;
-  data: AcceptableDocument | { type: string;[key: string]: any };
+  data: AcceptableDocument | { type: string; [key: string]: any };
 }
 
 export interface AppUserAcceptable {
@@ -54,6 +54,14 @@ export interface AppUserAcceptable {
   } | null;
 }
 
+export interface AcceptableItem {
+  name: string;
+  slug: string;
+  url: string;
+  uuid: string;
+  default_content_language_code: string;
+}
+
 export interface AcceptableVersion {
   url: string;
   uuid: string;
@@ -67,7 +75,7 @@ export interface AcceptableContent {
   language_code: string;
   display_name: string;
   content: string | null;
-  data: AcceptableDocument | { type: string;[key: string]: any };
+  data: AcceptableDocument | { type: string; [key: string]: any };
 }
 
 export interface PrivateInformationProvider {
@@ -79,7 +87,7 @@ export interface PrivateInformationProvider {
   getLatestObjectForType<T>(
     type: ObjectType,
     jwt: JWT,
-    includeNullAppUser?: boolean
+    includeNullAppUser?: boolean,
   ): Promise<PIPObject<T>>;
   updateObject<T>(type: ObjectType, data: T, jwt: JWT, status?: string): Promise<PIPObject<T>>;
   getAcceptable(id: string, jwt: JWT, languages?: string[]): Promise<AppUserAcceptable>;
