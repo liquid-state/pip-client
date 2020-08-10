@@ -5,8 +5,6 @@ import {
   AcceptableVersion,
   AcceptableContent,
 } from './types';
-import acceptable from './acceptable';
-import { Acceptable } from '.';
 
 interface IOptions {
   apiRoot?: string;
