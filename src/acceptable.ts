@@ -3,6 +3,7 @@ import {
   IPIPAcceptable,
   PrivateInformationProvider,
   JWT,
+  AcceptableItem,
   AppUserAcceptable,
   AcceptableVersion,
   AcceptableContent,
@@ -15,8 +16,8 @@ export default class implements IPIPAcceptable {
   constructor(
     private acceptableId: string,
     private pip: PrivateInformationProvider,
-    private jwt: JWT
-  ) { }
+    private jwt: JWT,
+  ) {}
 
   async acceptable(languages?: string[]) {
     if (!this._acceptable) {
@@ -37,15 +38,23 @@ export default class implements IPIPAcceptable {
 }
 
 export class PIPAdminAcceptable {
-  private _acceptable: AcceptableVersion;
+  private _acceptableItem: AcceptableItem;
+  private _acceptableVersion: AcceptableVersion;
 
-  constructor(private acceptableId: string, private pip: PIPAdminClient) { }
+  constructor(private acceptableId: string, private pip: PIPAdminClient) {}
+
+  async acceptableItem() {
+    if (!this._acceptableItem) {
+      this._acceptableItem = await this.pip.getAcceptableItem(this.acceptableId);
+    }
+    return this._acceptableItem;
+  }
 
   async acceptable() {
-    if (!this._acceptable) {
-      this._acceptable = await this.pip.getAcceptable(this.acceptableId, true);
+    if (!this._acceptableVersion) {
+      this._acceptableVersion = await this.pip.getAcceptable(this.acceptableId, true);
     }
-    return this._acceptable;
+    return this._acceptableVersion;
   }
 
   async isAccepted() {
@@ -54,14 +63,19 @@ export class PIPAdminAcceptable {
   }
 
   async content(languages: string[]) {
-    const acceptable = await this.acceptable();
-    const content = acceptable.content;
+    const acceptableItem = await this.acceptableItem();
+    const acceptableVersion = await this.acceptable();
+    const content = acceptableVersion.content;
     console.log('Content', content);
     // Map languages to the matching acceptable data,
     // return the first one which is not undefined.
-    const result = languages.map(lng => content.find(c => c.language_code === lng)).find(identity);
+    const matchableLanguages = [...languages, acceptableItem.default_content_language_code];
+    console.log('matchableLanguages: ', matchableLanguages);
+    const result = matchableLanguages
+      .map(lng => content.find(c => c.language_code === lng))
+      .find(identity);
     if (!result) {
-      throw 'No acceptable matches the languages supplied.';
+      throw 'No acceptable matches the languages supplied. Default content is presumably not configured.';
     }
     return result;
   }
