@@ -44,8 +44,15 @@ export default class PIPAdminClient {
     return resp.json();
   };
 
-  getAppUser = async (appUserUISId: string): Promise<object> => {
-    const url = `${this.getUrl('users')}?app_user_id=${appUserUISId}`;
+  getAppUserWithPipId = async (appUserPipUuid: string): Promise<object> => {
+    const url = `${this.getUrl('users')}${appUserPipUuid}/`;
+    const resp = await fetch(url, { headers: this.headers() });
+    this.verifyResponse(resp);
+    return resp.json();
+  };
+
+  getAppUser = async (appUserId: string): Promise<object> => {
+    const url = `${this.getUrl('users')}?app_user_id=${appUserId}`;
     const resp = await fetch(url, { headers: this.headers() });
     this.verifyResponse(resp);
     return resp.json();
