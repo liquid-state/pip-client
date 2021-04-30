@@ -356,13 +356,26 @@ export default class PIPAdminClient {
     } else {
       baseUrl = `${this.getUrl('objectTypes')}${objectType}/objects/`;
     }
+    let queryArgs : {app_user?: string, version?: string} = new Object();
     if (version === 'latest') {
-      let url = `${baseUrl}${version}/`;
-      if (app_user) {
-        url = `${url}?app_user=${app_user}`;
+      baseUrl = `${baseUrl}latest/`;
+      // return url;
+    } else if (version) {
+      queryArgs['version'] = version;
+    }
+    if (app_user) {
+      queryArgs['app_user'] = app_user;
+      // url = `${url}?app_user=${app_user}`;
+    }
+    if (Object.keys(queryArgs).length) {
+      let url = `${baseUrl}?`;
+      let arg: keyof typeof queryArgs;
+      for (arg in queryArgs) {
+        url += `${arg}=${queryArgs[arg]}&`;
       }
       return url;
+    } else {
+      return baseUrl;
     }
-    return version ? `${baseUrl}?version=${version}` : baseUrl;
   }
 }
