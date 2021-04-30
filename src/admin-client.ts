@@ -359,13 +359,11 @@ export default class PIPAdminClient {
     let queryArgs : {app_user?: string, version?: string} = new Object();
     if (version === 'latest') {
       baseUrl = `${baseUrl}latest/`;
-      // return url;
     } else if (version) {
       queryArgs['version'] = version;
     }
     if (app_user) {
       queryArgs['app_user'] = app_user;
-      // url = `${url}?app_user=${app_user}`;
     }
     if (Object.keys(queryArgs).length) {
       let url = `${baseUrl}?`;
