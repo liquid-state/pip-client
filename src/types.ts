@@ -99,7 +99,7 @@ export interface IPIPService {
   authenticateViaCode(code: string): Promise<JWT>;
   consumeCode(code: string, userId: string): Promise<void>;
   register(): Promise<void>;
-  getUserData<T>(dataType: string): Promise<PIPObject<T>>;
+  getUserData<T>(dataType: string, includeNullAppUser?: boolean): Promise<PIPObject<T>>;
   putUserData<T>(dataType: string, data: T, status?: string): Promise<PIPObject<T>>;
   raw(url: string, init: RequestInit): Promise<Response>;
   form(id: string): Promise<IPIPForm>;
