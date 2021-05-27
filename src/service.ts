@@ -52,10 +52,10 @@ export default class PIPService implements IPIPService {
     return body.results[0];
   };
 
-  getUserData = async <T>(dataType: string): Promise<PIPObject<T>> => {
+  getUserData = async <T>(dataType: string, includeNullAppUser = false): Promise<PIPObject<T>> => {
     const jwt = await this.jwt();
     const objectType = await this.pip.getObjectType(dataType, jwt);
-    return this.pip.getLatestObjectForType<T>(objectType, jwt);
+    return this.pip.getLatestObjectForType<T>(objectType, jwt, includeNullAppUser);
   };
 
   putUserData = async <T>(dataType: string, data: T, status?: string): Promise<PIPObject<T>> => {
