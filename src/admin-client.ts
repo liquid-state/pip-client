@@ -196,6 +196,30 @@ export default class PIPAdminClient {
     return resp.json();
   };
 
+  editObject = async <T>(object: PIPObject<T>, json: object): Promise<PIPObject<T>> => {
+    const url = object.url;
+    const resp = await fetch(url, {
+      method: 'PATCH',
+      headers: this.headers(),
+      body: JSON.stringify({
+        json,
+      })
+    });
+
+    this.verifyResponse(resp);
+    return resp.json();
+  }
+
+  deleteObject = async<T>(object: PIPObject<T>): Promise<PIPObject<T>> => {
+    const url = object.url;
+    const resp = await fetch(url, {
+      method: 'DELETE',
+      headers: this.headers(),
+    });
+    this.verifyResponse(resp);
+    return resp.json();
+  }
+
   createObjectType = async (
     name: string,
     app: string,

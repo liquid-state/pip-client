@@ -64,6 +64,16 @@ export default class PIPService implements IPIPService {
     return this.pip.updateObject(objectType, data, jwt, status);
   };
 
+  editUserData = async<T>(existing: PIPObject<T>, data: T, status?: string): Promise<PIPObject<T>> => {
+    const jwt = await this.jwt();
+    return this.pip.editObject(existing, data, jwt, status);
+  }
+
+  deleteUserData = async(existing: PIPObject): Promise<PIPObject> => {
+    const jwt = await this.jwt();
+    return this.pip.deleteObject(existing, jwt);
+  }
+
   /* Provides an interface for calling pip directly.
 
   Expects the user to provide a fully qualified url, request parameters etc.

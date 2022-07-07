@@ -162,6 +162,30 @@ export default class PIPClient implements PrivateInformationProvider {
     return resp.json();
   };
 
+  editObject = async<T>(existing: PIPObject<T>, data: T, jwt: JWT, status?: string): Promise<PIPObject<T>> => {
+    const url = existing.url;
+    const resp = await this.fetch(url, {
+      method: 'PUT',
+      headers: this.headers(jwt),
+      body: JSON.stringify({
+        json: data,
+        status
+      })
+    });
+    this.verifyResponse(resp);
+    return resp.json();
+  }
+
+  deleteObject = async (existing: PIPObject, jwt: JWT): Promise<PIPObject> => {
+    const url = existing.url;
+    const resp = await this.fetch(url, {
+      method: 'DELETE',
+      headers: this.headers(jwt),
+    });
+    this.verifyResponse(resp);
+    return resp.json();
+  }
+
   getAcceptable = async (
     id: string,
     jwt: JWT,
