@@ -52,9 +52,13 @@ export default class PIPService implements IPIPService {
     return body.results[0];
   };
 
-  getUserData = async <T>(dataType: string, includeNullAppUser = false): Promise<PIPObject<T>> => {
+  getUserData = async <T>(dataType: string, includeNullAppUser = false, version?: string): Promise<PIPObject<T>> => {
     const jwt = await this.jwt();
     const objectType = await this.pip.getObjectType(dataType, jwt);
+    if (version) {
+      const objects = await this.pip.getObjectsForType(objectType, jwt, version);
+      return (objects as any).results[0];
+    }
     return this.pip.getLatestObjectForType<T>(objectType, jwt, includeNullAppUser);
   };
 
@@ -63,6 +67,16 @@ export default class PIPService implements IPIPService {
     const objectType = await this.pip.getObjectType(dataType, jwt);
     return this.pip.updateObject(objectType, data, jwt, status);
   };
+
+  editUserData = async<T>(existing: PIPObject<T>, data: T, status?: string): Promise<PIPObject<T>> => {
+    const jwt = await this.jwt();
+    return this.pip.editObject(existing, data, jwt, status);
+  }
+
+  deleteUserData = async(existing: PIPObject): Promise<PIPObject> => {
+    const jwt = await this.jwt();
+    return this.pip.deleteObject(existing, jwt);
+  }
 
   /* Provides an interface for calling pip directly.
 
