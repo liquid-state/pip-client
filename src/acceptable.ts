@@ -16,7 +16,7 @@ export default class implements IPIPAcceptable {
   constructor(
     private acceptableId: string,
     private pip: PrivateInformationProvider,
-    private jwt: JWT,
+    private jwt: JWT
   ) {}
 
   async acceptable(languages?: string[]) {

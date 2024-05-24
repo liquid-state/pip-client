@@ -10,6 +10,7 @@ import {
 import { IIdentityProvider } from '@liquid-state/iwa-identity/dist/manager';
 import PIPForm from './form';
 import PIPAcceptable from './acceptable';
+import { PIPError } from './client';
 
 export type IdentityOptions = {
   jwt?: string;
@@ -19,7 +20,7 @@ export type IdentityOptions = {
 export default class PIPService implements IPIPService {
   private _jwt: string | undefined = undefined;
 
-  constructor(private pip: PrivateInformationProvider, private identity: IdentityOptions) { }
+  constructor(private pip: PrivateInformationProvider, private identity: IdentityOptions) {}
 
   form = async (id: string): Promise<IPIPForm> => {
     return new PIPForm(id, this.pip, await this.jwt());
@@ -52,7 +53,11 @@ export default class PIPService implements IPIPService {
     return body.results[0];
   };
 
-  getUserData = async <T>(dataType: string, includeNullAppUser = false, version?: string): Promise<PIPObject<T>> => {
+  getUserData = async <T>(
+    dataType: string,
+    includeNullAppUser = false,
+    version?: string
+  ): Promise<PIPObject<T>> => {
     const jwt = await this.jwt();
     const objectType = await this.pip.getObjectType(dataType, jwt);
     if (version) {
@@ -62,21 +67,46 @@ export default class PIPService implements IPIPService {
     return this.pip.getLatestObjectForType<T>(objectType, jwt, includeNullAppUser);
   };
 
-  putUserData = async <T>(dataType: string, data: T, status?: string): Promise<PIPObject<T>> => {
+  putUserData = async <T>(
+    dataType: string,
+    data: T,
+    status?: string,
+    options = { createIfMissing: false }
+  ): Promise<PIPObject<T>> => {
     const jwt = await this.jwt();
-    const objectType = await this.pip.getObjectType(dataType, jwt);
+    let objectType;
+    try {
+      objectType = await this.pip.getObjectType(dataType, jwt);
+    } catch (e) {
+      if (e.response) {
+        const error = e as PIPError;
+        if (error.response.status === 404 && options?.createIfMissing) {
+          const app = this.getAppFromJWT(jwt);
+          if (app) {
+            objectType = await this.pip.createObjectType(dataType, app, jwt);
+          }
+        }
+      }
+    }
+    if (!objectType) {
+      throw `Unable to get object type: ${dataType}`;
+    }
     return this.pip.updateObject(objectType, data, jwt, status);
   };
 
-  editUserData = async<T>(existing: PIPObject<T>, data: T, status?: string): Promise<PIPObject<T>> => {
+  editUserData = async <T>(
+    existing: PIPObject<T>,
+    data: T,
+    status?: string
+  ): Promise<PIPObject<T>> => {
     const jwt = await this.jwt();
     return this.pip.editObject(existing, data, jwt, status);
-  }
+  };
 
-  deleteUserData = async(existing: PIPObject): Promise<PIPObject> => {
+  deleteUserData = async (existing: PIPObject): Promise<PIPObject> => {
     const jwt = await this.jwt();
     return this.pip.deleteObject(existing, jwt);
-  }
+  };
 
   /* Provides an interface for calling pip directly.
 
@@ -130,5 +160,14 @@ export default class PIPService implements IPIPService {
       throw 'Unable to access pip, no valid authentication mechanism!';
     }
     return this._jwt;
+  }
+
+  private getAppFromJWT(jwt: string): string | undefined {
+    try {
+      const parts = jwt.split('.');
+      const payload = parts[1];
+      const decodedPayload = JSON.parse(atob(payload));
+      return decodedPayload['app'];
+    } catch {}
   }
 }

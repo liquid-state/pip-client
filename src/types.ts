@@ -9,8 +9,8 @@ export interface ObjectType {
   children: string[];
   parents: string[];
   objects: string;
-  is_editable: boolean,
-  is_deletable: boolean,
+  is_editable: boolean;
+  is_deletable: boolean;
 }
 
 export interface PIPObject<T = object> {
@@ -21,9 +21,9 @@ export interface PIPObject<T = object> {
   json: T;
   status: string | null;
   created: ISO8601DateTime;
-  record_type: "create" | "update" | "delete";
-  previous_version: string | null,
-  is_modified: boolean,
+  record_type: 'create' | 'update' | 'delete';
+  previous_version: string | null;
+  is_modified: boolean;
 }
 
 export interface AcceptableDocument {
@@ -91,15 +91,22 @@ export interface PrivateInformationProvider {
   consumeCode(code: string, appUserId: string, jwt: JWT): Promise<void>;
   register(jwt: JWT): Promise<void>;
   getObjectType(key: string, jwt: JWT): Promise<ObjectType>;
+  createObjectType(
+    key: string,
+    app: string,
+    jwt: JWT,
+    parents?: string[],
+    children?: string[]
+  ): Promise<ObjectType>;
   getObjectsForType<T>(type: ObjectType, jwt: JWT, version?: string): Promise<PIPObject<T>[]>;
   getLatestObjectForType<T>(
     type: ObjectType,
     jwt: JWT,
-    includeNullAppUser?: boolean,
+    includeNullAppUser?: boolean
   ): Promise<PIPObject<T>>;
   updateObject<T>(type: ObjectType, data: T, jwt: JWT, status?: string): Promise<PIPObject<T>>;
   editObject<T>(existing: PIPObject<T>, data: T, jwt: JWT, status?: string): Promise<PIPObject<T>>;
-  deleteObject (existing: PIPObject, jwt: JWT): Promise<PIPObject>;
+  deleteObject(existing: PIPObject, jwt: JWT): Promise<PIPObject>;
   getAcceptable(id: string, jwt: JWT, languages?: string[]): Promise<AppUserAcceptable>;
   sendAcceptance(acceptable: AppUserAcceptable, jwt: JWT): Promise<void>;
   getUser(sub: string, jwt: JWT): Promise<PIPUserResponse>;
