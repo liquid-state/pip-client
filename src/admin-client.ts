@@ -70,7 +70,7 @@ export default class PIPAdminClient {
     appUUID: string,
     appUserUISId: string,
     userType?: string,
-    code?: string,
+    code?: string
   ): Promise<object> => {
     const url = `${this.getUrl('users')}`;
     const resp = await fetch(url, {
@@ -127,7 +127,7 @@ export default class PIPAdminClient {
   getObjectsForType = async <T>(
     type: ObjectType | string,
     version?: string,
-    appUser?: string,
+    appUser?: string
   ): Promise<PIPObject<T>[]> => {
     const url = this.buildObjectsUrl(type, version, appUser);
     const resp = await fetch(url, { headers: this.headers() });
@@ -138,7 +138,7 @@ export default class PIPAdminClient {
   describeVersionsForType = async <T>(
     type: string,
     appUser?: string,
-    appUserObjectTypes?: string[],
+    appUserObjectTypes?: string[]
   ): Promise<PIPObject<T>[]> => {
     let url = `${this.getUrl('objectTypes')}${type}/describe_versions/`;
     if (appUser) {
@@ -158,7 +158,7 @@ export default class PIPAdminClient {
     filters?: {
       status?: string[];
       excludeStatus?: string[];
-    },
+    }
   ): Promise<PIPObject<T>[]> => {
     let url = this.buildObjectsUrl(type, 'latest');
     if (appUsers) {
@@ -180,7 +180,7 @@ export default class PIPAdminClient {
   createObject = async <T>(
     type: ObjectType | string,
     json: object,
-    app_user?: string,
+    app_user?: string
   ): Promise<PIPObject<T>> => {
     const url = this.buildObjectsUrl(type);
 
@@ -203,14 +203,14 @@ export default class PIPAdminClient {
       headers: this.headers(),
       body: JSON.stringify({
         json,
-      })
+      }),
     });
 
     this.verifyResponse(resp);
     return resp.json();
-  }
+  };
 
-  deleteObject = async<T>(object: PIPObject<T>): Promise<PIPObject<T>> => {
+  deleteObject = async <T>(object: PIPObject<T>): Promise<PIPObject<T>> => {
     const url = object.url;
     const resp = await fetch(url, {
       method: 'DELETE',
@@ -218,13 +218,13 @@ export default class PIPAdminClient {
     });
     this.verifyResponse(resp);
     return resp.json();
-  }
+  };
 
   createObjectType = async (
     name: string,
     app: string,
     parents?: string[],
-    children?: string[],
+    children?: string[]
   ): Promise<ObjectType> => {
     const url = this.getUrl('objectTypes');
 
@@ -270,7 +270,7 @@ export default class PIPAdminClient {
     const contentResp = await fetch(latest.content, { headers: this.headers() });
     if (!contentResp.ok) {
       throw new Error(
-        `Unable to load acceptable version content for acceptable ${id} and version ${latest}`,
+        `Unable to load acceptable version content for acceptable ${id} and version ${latest}`
       );
     }
     latest.content = (await contentResp.json()).results;
@@ -279,7 +279,7 @@ export default class PIPAdminClient {
 
   sendAcceptance = async (
     acceptable: AcceptableVersion,
-    content: AcceptableContent,
+    content: AcceptableContent
   ): Promise<void> => {
     const baseUrl = await this.getUrl('acceptances');
     const body = JSON.stringify({ version: acceptable.uuid, version_content: content.uuid });
@@ -380,7 +380,7 @@ export default class PIPAdminClient {
     } else {
       baseUrl = `${this.getUrl('objectTypes')}${objectType}/objects/`;
     }
-    let queryArgs : {app_user?: string, version?: string} = new Object();
+    let queryArgs: { app_user?: string; version?: string } = new Object();
     if (version === 'latest') {
       baseUrl = `${baseUrl}latest/`;
     } else if (version) {

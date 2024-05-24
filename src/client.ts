@@ -13,6 +13,12 @@ export type PIPOptions = {
   fetch?: typeof fetch;
 };
 
+export class PIPError extends Error {
+  constructor(public message: string, public response: Response) {
+    super(message);
+  }
+}
+
 // Basic map of pip urls when using an apiRoot
 const domainMap: { [key: string]: string } = {
   registerWithoutCode: '/api/v1/users/',
@@ -111,6 +117,29 @@ export default class PIPClient implements PrivateInformationProvider {
     return objectType;
   };
 
+  createObjectType = async (
+    name: string,
+    app: string,
+    jwt: string,
+    parents?: string[],
+    children?: string[]
+  ): Promise<ObjectType> => {
+    const url = this.getUrl('objectTypes');
+
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: this.headers(jwt),
+      body: JSON.stringify({
+        name,
+        app,
+        children: children || [],
+        parents: parents || [],
+      }),
+    });
+    this.verifyResponse(resp);
+    return resp.json();
+  };
+
   getObjectsForType = async <T>(
     type: ObjectType | string,
     jwt: JWT,
@@ -148,7 +177,12 @@ export default class PIPClient implements PrivateInformationProvider {
     return resp.json();
   };
 
-  updateObject = async <T>(type: ObjectType, data: T, jwt: JWT, status?: string): Promise<PIPObject<T>> => {
+  updateObject = async <T>(
+    type: ObjectType,
+    data: T,
+    jwt: JWT,
+    status?: string
+  ): Promise<PIPObject<T>> => {
     const url = type.objects;
     const resp = await this.fetch(url, {
       method: 'POST',
@@ -162,19 +196,24 @@ export default class PIPClient implements PrivateInformationProvider {
     return resp.json();
   };
 
-  editObject = async<T>(existing: PIPObject<T>, data: T, jwt: JWT, status?: string): Promise<PIPObject<T>> => {
+  editObject = async <T>(
+    existing: PIPObject<T>,
+    data: T,
+    jwt: JWT,
+    status?: string
+  ): Promise<PIPObject<T>> => {
     const url = existing.url;
     const resp = await this.fetch(url, {
       method: 'PUT',
       headers: this.headers(jwt),
       body: JSON.stringify({
         json: data,
-        status
-      })
+        status,
+      }),
     });
     this.verifyResponse(resp);
     return resp.json();
-  }
+  };
 
   deleteObject = async (existing: PIPObject, jwt: JWT): Promise<PIPObject> => {
     const url = existing.url;
@@ -184,7 +223,7 @@ export default class PIPClient implements PrivateInformationProvider {
     });
     this.verifyResponse(resp);
     return resp.json();
-  }
+  };
 
   getAcceptable = async (
     id: string,
@@ -194,7 +233,7 @@ export default class PIPClient implements PrivateInformationProvider {
     const baseUrl = await this.getUrl('acceptables');
     const url = `${baseUrl}${id}/${
       languages && languages.length ? `?language=${languages.join(',')}` : ''
-      }`;
+    }`;
     let resp = await fetch(url, { headers: this.headers(jwt) });
     return resp.json();
   };
@@ -236,7 +275,7 @@ export default class PIPClient implements PrivateInformationProvider {
 
   private verifyResponse(resp: Response) {
     if (!resp.ok) {
-      throw Error(`Invalid PIP Response: ${resp}`);
+      throw new PIPError(`Invalid PIP Response: ${resp}`, resp);
     }
   }
 
